@@ -52,6 +52,12 @@ jobs:
               "docker stop leavecalc || true",
               "docker rm leavecalc || true",
               "docker run -d --name leavecalc -p 8080:8080 --restart=always \
+              --log-driver=awslogs \
+          --log-opt awslogs-region=ap-northeast-2 \
+          --log-opt awslogs-group=/ec2/leavecalc \
+          --log-opt awslogs-create-group=true \
+          --log-opt awslogs-stream=${INSTANCE_ID}-leavecalc \
+          --log-opt awslogs-multiline-pattern=^\\d{4}-\\d{2}-\\d{2}T \
                 -e RDS_HOST=${{ secrets.RDS_HOST }} \
                 -e DB_NAME=${{ secrets.DB_NAME }} \
                 -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
