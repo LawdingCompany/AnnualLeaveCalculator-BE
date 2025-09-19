@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: leavecalc
+
+  datasource:
+    url: jdbc:mysql://lawdingdb.cdsmiu2m0dc8.ap-northeast-2.rds.amazonaws.com:3306/leave_calculator
+    username: leavecalc_ec2
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  db:
+    host: lawdingdb.cdsmiu2m0dc8.ap-northeast-2.rds.amazonaws.com
+    port: 3306

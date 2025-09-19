@@ -1,8 +1,9 @@
 package com.lawding.leavecalc.domain.feedback.service;
 
-import org.springframework.stereotype.Service;
+import com.lawding.leavecalc.domain.feedback.dto.request.FeedbackRequest;
+import com.lawding.leavecalc.domain.global.common.enums.Platform;
 
-@Service
-public class FeedbackService {
+public interface FeedbackService {
 
+    void createFeedback(FeedbackRequest request, Platform platform);
 }
