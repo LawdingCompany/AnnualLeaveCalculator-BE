@@ -6,8 +6,11 @@ import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
+
+@Slf4j
 public class InternalAuthFilter extends HttpFilter {
 
     @Value("${internal.secret")
@@ -19,11 +22,15 @@ public class InternalAuthFilter extends HttpFilter {
         FilterChain chain) throws IOException, ServletException {
         String header= request.getHeader("X-Internal-Auth");
 
+        log.info("InternalAuthFilter 실행: X-Internal-Auth={}, remoteAddr={}",
+            header, request.getRemoteAddr());
+
         if(header==null || !header.equals(internalSecret)){
+            log.warn("인증 실패: 잘못된 X-Internal-Auth 헤더");
             response.sendError(HttpServletResponse.SC_FORBIDDEN,"Forbidden");
             return;
         }
-
+        log.debug("정상적인 요청 인증");
         chain.doFilter(request,response);
     }
 }
