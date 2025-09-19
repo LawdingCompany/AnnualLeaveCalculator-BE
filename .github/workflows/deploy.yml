@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest ./backend/leavecalc
           docker push ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest
 
       - name: Deploy to EC2
