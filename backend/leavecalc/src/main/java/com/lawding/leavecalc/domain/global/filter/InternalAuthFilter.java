@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 public class InternalAuthFilter extends HttpFilter {
 
-    @Value("${internal.secret")
+    @Value("${internal.secret}")
     private String internalSecret;
 
 
