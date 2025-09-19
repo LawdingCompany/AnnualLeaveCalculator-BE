@@ -1,41 +1,55 @@
-name: CI/CD Pipeline
+name: Deploy Annual Leave Calculator (EC2 + SSM + DockerHub)
 
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      # 1. 소스 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      # 2. AWS 자격 증명 (EC2 SSM 명령 실행용)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # 3. Docker Hub 로그인 (public이라 로그인 없어도 되지만, 푸시하려면 로그인 필요)
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image
+      # 4. Docker 이미지 빌드 & Docker Hub 푸시
+      - name: Build and push to Docker Hub
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest ./backend/leavecalc
-          docker push ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/leavecalc:latest
+          docker build -t $IMAGE ./backend/leavecalc
+          docker push $IMAGE
 
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            docker stop leavecalc || true
-            docker rm leavecalc || true
-            docker pull ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest
-            docker run -d --name leavecalc -p 8080:8080 \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e RDS_HOST=${{ secrets.RDS_HOST }} \
-              -e DB_NAME=${{ secrets.DB_NAME }} \
-              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-              ${{ secrets.DOCKER_USERNAME }}/leavecalc:latest
+      # 5. EC2에서 컨테이너 교체 (SSM 사용)
+      - name: Deploy on EC2 via SSM
+        run: |
+          INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/leavecalc:latest
+
+          aws ssm send-command \
+            --targets "Key=instanceIds,Values=$INSTANCE_ID" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy leavecalc" \
+            --parameters 'commands=[
+              "set -e",
+              "docker pull '$IMAGE'",
+              "docker stop leavecalc || true",
+              "docker rm leavecalc || true",
+              "docker run -d --name leavecalc -p 8080:8080 --restart=always '$IMAGE'"
+            ]'
