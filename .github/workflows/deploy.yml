@@ -43,18 +43,22 @@ jobs:
           IMAGE=${{ secrets.DOCKER_USERNAME }}/leavecalc:latest
 
           aws ssm send-command \
+            --cli-binary-format raw-in-base64-out \
             --targets "Key=instanceIds,Values=$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy leavecalc" \
-            --parameters 'commands=[
-              "set -e",
-              "docker pull '$IMAGE'",
-              "docker stop leavecalc || true",
-              "docker rm leavecalc || true",
-              "docker run -d --name leavecalc -p 8080:8080 --restart=always \
-                -e RDS_HOST=${{ secrets.RDS_HOST }} \
-                -e DB_NAME=${{ secrets.DB_NAME }} \
-                -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
-                -e INTERNAL_AUTH_SECRET=${{ secrets.INTERNAL_AUTH_SECRET }} \
-                '$IMAGE'"
-            ]'
+            --parameters '{
+              "commands": [
+                "set -e",
+                "docker pull '"$IMAGE"'",
+                "docker stop leavecalc || true",
+                "docker rm leavecalc || true",
+                "docker run -d --name leavecalc -p 8080:8080 --restart=always \
+                  -e RDS_HOST='${{ secrets.RDS_HOST }}' \
+                  -e DB_NAME='${{ secrets.DB_NAME }}' \
+                  -e DB_USERNAME='${{ secrets.DB_USERNAME }}' \
+                  -e INTERNAL_AUTH_SECRET='${{ secrets.INTERNAL_AUTH_SECRET }}' \
+                  '"$IMAGE"'",
+                "docker image prune -f || true"
+              ]
+            }'
