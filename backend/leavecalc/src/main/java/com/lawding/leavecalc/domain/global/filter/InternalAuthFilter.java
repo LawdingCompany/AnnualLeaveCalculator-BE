@@ -7,13 +7,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 
 @Slf4j
 public class InternalAuthFilter extends HttpFilter {
 
-    private final String internalSecret; // ✅ 생성자 주입
+    private final String internalSecret;
 
     public InternalAuthFilter(String internalSecret) {
         this.internalSecret = internalSecret;
@@ -25,7 +24,6 @@ public class InternalAuthFilter extends HttpFilter {
 
         log.info("InternalAuthFilter 실행: X-Internal-Auth={}, remoteAddr={}",
             header, request.getRemoteAddr());
-        log.info("비교 값  = {} ", internalSecret);
         if (header == null || !header.equals(internalSecret)) {
             log.warn("인증 실패: 잘못된 X-Internal-Auth 헤더");
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");

@@ -17,8 +17,8 @@ spring:
 
 logging:
   level:
-    root: DEBUG
-    com.lawding.leavecalc: DEBUG
+    root: INFO
+    com.lawding.leavecalc: INFO
 
 app:
   db:
