@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  * - ApplicationException: 도메인/서비스 레벨의 명시적 에러코드 처리 - Validation, 바인딩, JSON 파싱, HTTP 메서드 등 흔한 4xx 처리
  * - DataIntegrityViolation / 그 외 예기치 못한 5xx 처리
  */
-@RestControllerAdvice
+//@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     // ---- ApplicationException (도메인 예외) ----
