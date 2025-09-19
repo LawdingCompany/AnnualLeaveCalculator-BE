@@ -1,4 +1,4 @@
-package com.lawding.leavecalc.global.config;
+package com.lawding.leavecalc.domain.global.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

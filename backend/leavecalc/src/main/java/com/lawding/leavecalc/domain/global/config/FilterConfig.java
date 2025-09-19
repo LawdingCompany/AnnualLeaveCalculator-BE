@@ -1,6 +1,6 @@
-package com.lawding.leavecalc.global.config;
+package com.lawding.leavecalc.domain.global.config;
 
-import com.lawding.leavecalc.global.filter.InternalAuthFilter;
+import com.lawding.leavecalc.domain.global.filter.InternalAuthFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
