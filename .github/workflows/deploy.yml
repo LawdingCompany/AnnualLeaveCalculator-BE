@@ -36,7 +36,7 @@ jobs:
           docker build -t $IMAGE ./backend/leavecalc
           docker push $IMAGE
 
-      # 5. EC2에서 컨테이너 실행 (SSM)
+            # 5. EC2에서 컨테이너 실행 (SSM)
       - name: Deploy on EC2 via SSM
         run: |
           INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
@@ -53,7 +53,17 @@ jobs:
                 "docker pull '"$IMAGE"'",
                 "docker stop leavecalc || true",
                 "docker rm leavecalc || true",
-                "docker run -d --name leavecalc -p 8080:8080 --restart=always -e RDS_HOST=${{ secrets.RDS_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e INTERNAL_AUTH_SECRET=${{ secrets.INTERNAL_AUTH_SECRET }} '"$IMAGE"'",
+                "docker run -d --name leavecalc -p 8080:8080 --restart=always \
+                  --log-driver=awslogs \
+                  --log-opt awslogs-region=ap-northeast-2 \
+                  --log-opt awslogs-group=/ec2/leavecalc \
+                  --log-opt awslogs-create-group=true \
+                  --log-opt awslogs-stream=${INSTANCE_ID}-leavecalc \
+                  -e RDS_HOST=${{ secrets.RDS_HOST }} \
+                  -e DB_NAME=${{ secrets.DB_NAME }} \
+                  -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+                  -e INTERNAL_AUTH_SECRET=${{ secrets.INTERNAL_AUTH_SECRET }} \
+                  '"$IMAGE"'",
                 "docker image prune -f || true"
               ]
             }'
