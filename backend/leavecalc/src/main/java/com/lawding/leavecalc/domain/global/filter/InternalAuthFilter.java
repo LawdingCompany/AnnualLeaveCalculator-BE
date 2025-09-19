@@ -1,4 +1,4 @@
-package com.lawding.leavecalc.global.filter;
+package com.lawding.leavecalc.domain.global.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,7 +24,7 @@ public class InternalAuthFilter extends HttpFilter {
 
         log.info("InternalAuthFilter 실행: X-Internal-Auth={}, remoteAddr={}",
             header, request.getRemoteAddr());
-
+        log.info("비교 값  = {} ",internalSecret);
         if(header==null || !header.equals(internalSecret)){
             log.warn("인증 실패: 잘못된 X-Internal-Auth 헤더");
             response.sendError(HttpServletResponse.SC_FORBIDDEN,"Forbidden");

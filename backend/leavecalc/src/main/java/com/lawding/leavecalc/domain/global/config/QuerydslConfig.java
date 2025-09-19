@@ -1,4 +1,4 @@
-package com.lawding.leavecalc.global.config;
+package com.lawding.leavecalc.domain.global.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
