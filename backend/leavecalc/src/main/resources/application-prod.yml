@@ -3,8 +3,8 @@ spring:
     name: leavecalc
 
   datasource:
-    url: jdbc:mysql://lawdingdb.cdsmiu2m0dc8.ap-northeast-2.rds.amazonaws.com:3306/leave_calculator
-    username: leavecalc_ec2
+    url: jdbc:mysql://${RDS_HOST}:3306/${DB_NAME}
+    username: ${DB_USERNAME}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -17,5 +17,8 @@ spring:
 
 app:
   db:
-    host: lawdingdb.cdsmiu2m0dc8.ap-northeast-2.rds.amazonaws.com
+    host: ${RDS_HOST}
     port: 3306
+
+internal:
+  secret: ${INTERNAL_AUTH_SECRET}
