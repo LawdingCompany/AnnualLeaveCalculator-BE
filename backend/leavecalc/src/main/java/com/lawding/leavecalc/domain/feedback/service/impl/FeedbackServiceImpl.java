@@ -7,6 +7,7 @@ import com.lawding.leavecalc.domain.feedback.service.FeedbackService;
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,9 +19,10 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     private final FeedbackRepository feedbackRepository;
 
+    @Async("feedbackExecutor")
     @Transactional
     @Override
-    public void createFeedback(FeedbackRequest request, Platform platform) {
+    public void createFeedback(FeedbackRequest request, Platform platform, Boolean isTest) {
         Feedback feedback = Feedback.builder()
             .platform(platform)
             .type(request.type())
@@ -29,7 +31,11 @@ public class FeedbackServiceImpl implements FeedbackService {
             .rating(request.rating())
             .calculationId(request.calculationId())
             .build();
-
+        if (Boolean.TRUE.equals(isTest)) {
+            log.debug("테스트 호출 감지 -> DB 저장 생략");
+            return;
+        }
         feedbackRepository.save(feedback);
+        log.debug("피드백 저장 완료 : {}", feedback.getId());
     }
 }

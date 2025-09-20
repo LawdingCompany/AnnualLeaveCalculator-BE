@@ -1,0 +1,31 @@
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+  <property name="LOG_PATH" value="logs"/>
+
+  <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+      <providers>
+        <!-- 타임스탬프 -->
+        <timestamp>
+          <timeZone>Asia/Seoul</timeZone>
+        </timestamp>
+        <!-- 로그 레벨 -->
+        <level/>
+        <!-- 로거 이름 -->
+        <loggerName/>
+        <!-- 쓰레드 이름 -->
+        <threadName/>
+        <!-- 메시지 -->
+        <message/>
+        <!-- 예외 스택 -->
+        <stackTrace/>
+        <!-- MDC (추적 ID 등) -->
+        <mdc/>
+      </providers>
+    </encoder>
+  </appender>
+
+  <root level="INFO">
+    <appender-ref ref="JSON"/>
+  </root>
+</configuration>
