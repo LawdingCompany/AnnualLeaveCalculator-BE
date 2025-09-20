@@ -13,6 +13,8 @@ spring:
       max-lifetime: 840000 # 14분 (토큰 만료 15분 보다 짧게)
       idle-timeout: 600000 # 10분
       connection-timeout: 30000
+      validation-timeout: 5000
+      connection-test-query: SELECT 1
 
   jpa:
     hibernate:

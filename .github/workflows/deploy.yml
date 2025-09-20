@@ -33,7 +33,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           IMAGE=${{ secrets.DOCKER_USERNAME }}/leavecalc:latest
-          docker build -t $IMAGE ./backend/leavecalc
+          docker build --no-cache -t $IMAGE ./backend/leavecalc
           docker push $IMAGE
 
       # 5. EC2에서 컨테이너 실행 (SSM)
