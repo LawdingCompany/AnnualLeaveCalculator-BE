@@ -22,6 +22,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public void createFeedback(FeedbackRequest request, Platform platform) {
         Feedback feedback = Feedback.builder()
+            .platform(platform)
             .type(request.type())
             .content(request.content())
             .email(request.email())

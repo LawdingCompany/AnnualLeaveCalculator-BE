@@ -49,8 +49,10 @@ public class Feedback {
     private LocalDateTime createdAt;
 
     @Builder
-    public Feedback(FeedbackType type, String content, String email, Integer rating,
+    public Feedback(Platform platform, FeedbackType type, String content, String email,
+        Integer rating,
         String calculationId) {
+        this.platform = platform;
         this.type = type;
         this.content = content;
         this.email = email;
