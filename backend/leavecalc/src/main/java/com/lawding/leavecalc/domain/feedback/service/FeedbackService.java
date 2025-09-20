@@ -5,5 +5,5 @@ import com.lawding.leavecalc.domain.global.common.enums.Platform;
 
 public interface FeedbackService {
 
-    void createFeedback(FeedbackRequest request, Platform platform);
+    void createFeedback(FeedbackRequest request, Platform platform, Boolean isTest);
 }

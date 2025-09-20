@@ -44,6 +44,10 @@ public class Feedback {
     @Column(name = "calculation_id", length = 36)
     private String calculationId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private FeedbackStatus status;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -58,5 +62,11 @@ public class Feedback {
         this.email = email;
         this.rating = rating;
         this.calculationId = calculationId;
+        this.status = FeedbackStatus.RECEIVED;
     }
+
+    public void updateStatus(FeedbackStatus newStatus) {
+        this.status = newStatus;
+    }
+
 }

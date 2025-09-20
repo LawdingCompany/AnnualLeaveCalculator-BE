@@ -23,11 +23,12 @@ public class FeedbackController {
     private final FeedbackService feedbackService;
 
     @PostMapping
-    public ResponseEntity<?> createFeedback(
+    public ResponseEntity<ApiResponse<Void>> createFeedback(
         @Valid @RequestBody FeedbackRequest request,
-        @RequestHeader(value = "X-Platform") Platform platform) {
-        log.debug("피드백 요청 수신 : {}, platform = {}", request, platform);
-        feedbackService.createFeedback(request, platform);
+        @RequestHeader(value = "X-Platform") Platform platform,
+        @RequestHeader(value = "X-Test", required = false) Boolean isTest) {
+        log.debug("피드백 요청 수신 : {}, platform = {} isTest = {}", request, platform, isTest);
+        feedbackService.createFeedback(request, platform, isTest);
         return ResponseEntity.ok(ApiResponse.okMessage("피드백이 등록되었습니다."));
     }
 }
