@@ -1,6 +1,5 @@
 package com.lawding.leavecalc.domain.global.exception;
 
-import com.lawding.leavecalc.domain.feedback.dto.request.FeedbackRequest;
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
 import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,19 +13,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponseException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import software.amazon.awssdk.services.rds.model.ResourceNotFoundException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ---- ApplicationException ----
+    // ---- ApplicationException (커스텀) ----
     @ExceptionHandler(ApplicationException.class)
     public ResponseEntity<ApiResponse<Void>> handleApplicationException(
         ApplicationException ex, HttpServletRequest req) {
@@ -36,12 +35,10 @@ public class GlobalExceptionHandler {
 
         ErrorCode ec = ex.getErrorCode();
         return ResponseEntity.status(ec.getHttpStatus())
-            .body(ApiResponse.error(
-                ec.getCode(), ex.getMessage(), path(req), traceId()
-            ));
+            .body(ApiResponse.error(ec.getCode(), ex.getMessage(), path(req), traceId()));
     }
 
-    // ---- DTO Validation ----
+    // ---- DTO 유효성 검사 실패 (@Valid) → VALIDATION_FAILED ----
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex, HttpServletRequest req) {
@@ -61,7 +58,7 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    // ---- 파라미터 Validation ----
+    // ---- 파라미터 유효성 검사 실패 (@Validated) → VALIDATION_FAILED ----
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ApiResponse<Void>> handleConstraintViolation(
         ConstraintViolationException ex, HttpServletRequest req) {
@@ -80,7 +77,7 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    // ---- JSON 파싱 실패 ----
+    // ---- JSON 파싱 실패 → JSON_PARSE_ERROR ----
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<Void>> handleNotReadable(
         HttpMessageNotReadableException ex, HttpServletRequest req) {
@@ -94,21 +91,31 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    // ---- DataIntegrity ----
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(
-        DataIntegrityViolationException ex, HttpServletRequest req) {
+    // ---- 필수 헤더 누락 → MISSING_X_PLATFORM_HEADER / INVALID_INPUT ----
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingHeader(
+        MissingRequestHeaderException ex, HttpServletRequest req) {
 
-        log.error("DataIntegrityViolation at uri={}, traceId={}", path(req), traceId(), ex);
+        if ("X-Platform".equalsIgnoreCase(ex.getHeaderName())) {
+            log.error("Missing X-Platform header at uri={}, traceId={}", path(req), traceId(), ex);
+
+            return ResponseEntity.badRequest().body(ApiResponse.error(
+                ErrorCode.MISSING_X_PLATFORM_HEADER.getCode(),
+                ErrorCode.MISSING_X_PLATFORM_HEADER.getMessage(),
+                path(req), traceId()
+            ));
+        }
+
+        log.error("Missing header {} at uri={}, traceId={}", ex.getHeaderName(), path(req), traceId(), ex);
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
-            "데이터 무결성 제약조건을 위반했습니다.",
+            "필수 헤더가 누락되었습니다: " + ex.getHeaderName(),
             path(req), traceId()
         ));
     }
 
-    // ---- 헤더 타입/바인딩 오류 ----
+    // ---- 헤더 값 타입/바인딩 오류 → INVALID_PLATFORM_HEADER / INVALID_INPUT ----
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiResponse<Void>> handleTypeMismatch(
         MethodArgumentTypeMismatchException ex, HttpServletRequest req) {
@@ -130,8 +137,7 @@ public class GlobalExceptionHandler {
             ));
         }
 
-        log.error("TypeMismatch at uri={}, param={}, traceId={}",
-            path(req), ex.getName(), traceId(), ex);
+        log.error("TypeMismatch at uri={}, param={}, traceId={}", path(req), ex.getName(), traceId(), ex);
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
@@ -140,17 +146,77 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    // ---- 최후 보루: 모든 Exception ----
+    // ---- 허용되지 않은 HTTP 메서드 → METHOD_NOT_ALLOWED ----
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMethodNotAllowed(
+        HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
+
+        log.error("MethodNotAllowed at uri={}, method={}, traceId={}",
+            path(req), ex.getMethod(), traceId(), ex);
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(ApiResponse.error(
+            ErrorCode.METHOD_NOT_ALLOWED.getCode(),
+            ErrorCode.METHOD_NOT_ALLOWED.getMessage(),
+            path(req), traceId()
+        ));
+    }
+
+    // ---- 데이터 무결성 위반 → INVALID_INPUT ----
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(
+        DataIntegrityViolationException ex, HttpServletRequest req) {
+
+        log.error("DataIntegrityViolation at uri={}, traceId={}", path(req), traceId(), ex);
+
+        return ResponseEntity.badRequest().body(ApiResponse.error(
+            ErrorCode.INVALID_INPUT.getCode(),
+            "데이터 무결성 제약조건을 위반했습니다.",
+            path(req), traceId()
+        ));
+    }
+
+    // ---- 리소스 없음 → NOT_FOUND ----
+    @ExceptionHandler(ResourceNotFoundException.class) // 별도로 정의 필요
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(
+        ResourceNotFoundException ex, HttpServletRequest req) {
+
+        log.error("NotFound at uri={}, msg={}, traceId={}", path(req), ex.getMessage(), traceId(), ex);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(
+            ErrorCode.NOT_FOUND.getCode(),
+            ErrorCode.NOT_FOUND.getMessage(),
+            path(req), traceId()
+        ));
+    }
+
+    // ---- 스프링 기본 ErrorResponseException → INVALID_INPUT or INTERNAL_ERROR ----
+    @ExceptionHandler(ErrorResponseException.class)
+    public ResponseEntity<ApiResponse<Void>> handleErrorResponse(
+        ErrorResponseException ex, HttpServletRequest req) {
+
+        HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
+        HttpStatus http = status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status;
+
+        log.error("ErrorResponseException at uri={}, httpStatus={}, traceId={}",
+            path(req), http, traceId(), ex);
+
+        return ResponseEntity.status(http).body(ApiResponse.error(
+            http.is4xxClientError() ? ErrorCode.INVALID_INPUT.getCode() : ErrorCode.INTERNAL_ERROR.getCode(),
+            safeMessage(ex.getMessage(), http),
+            path(req), traceId()
+        ));
+    }
+
+    // ---- 최후 보루 (정의되지 않은 예외 전부) → INTERNAL_ERROR ----
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAny(Exception ex, HttpServletRequest req) {
         log.error("Unhandled exception at uri={}, traceId={}", path(req), traceId(), ex);
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error(
-                ErrorCode.INTERNAL_ERROR.getCode(),
-                ErrorCode.INTERNAL_ERROR.getMessage(),
-                path(req), traceId()
-            ));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(
+            ErrorCode.INTERNAL_ERROR.getCode(),
+            ErrorCode.INTERNAL_ERROR.getMessage(),
+            path(req), traceId()
+        ));
     }
 
     // ========= helpers =========
