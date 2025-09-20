@@ -1,17 +1,19 @@
 package com.lawding.leavecalc.domain.global.common.enums;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum Platform {
     WEB("web"),
     IOS("ios"),
     OTHER("other");
 
-    private final String label;
+    private final String value;
 
-    Platform(String label) {
-        this.label = label;
+    Platform(String value) {
+        this.value = value;
     }
-
-    public String getLabel() {
-        return label;
+    @JsonValue
+    public String getValue() {
+        return value;
     }
 }
