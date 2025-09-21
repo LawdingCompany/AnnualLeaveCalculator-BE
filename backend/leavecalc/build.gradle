@@ -36,9 +36,7 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	// AWS SDK (IAM 인증 토큰 발급용)
-	implementation "software.amazon.awssdk:rds:2.25.63"
-	// AWS JDBC Driver for MySQL (IAM 인증 자동 갱신 지원)
-	implementation "software.aws.rds:aws-mysql-jdbc:1.1.9"
+	implementation "software.amazon.awssdk:rds:2.31.6"
 
 	// --- Lombok ---
 	compileOnly 'org.projectlombok:lombok'
