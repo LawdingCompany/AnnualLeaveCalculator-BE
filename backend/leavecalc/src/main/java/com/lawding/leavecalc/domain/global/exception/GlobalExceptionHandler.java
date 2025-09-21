@@ -19,7 +19,6 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import software.amazon.awssdk.services.rds.model.ResourceNotFoundException;
 
 @Slf4j
 @RestControllerAdvice
