@@ -3,17 +3,17 @@ spring:
     name: leavecalc
 
   datasource:
-    url: jdbc:mysql:aws://${RDS_HOST}:3306/${DB_NAME}?wrapperPlugins=iam
+    url: jdbc:mysql:aws://${RDS_HOST}:3306/${DB_NAME}?wrapperPlugins=iam&sslMode=REQUIRED
     username: ${DB_USERNAME}
     driver-class-name: software.aws.rds.jdbc.mysql.Driver
-#    hikari:
-#      maximum-pool-size: 5
-#      minimum-idle: 1
-#      max-lifetime: 600000        # 10분 (토큰 15분 만료 전에 교체)
-#      idle-timeout: 600000        # 10분 (idle이 오래되면 닫기)
-#      connection-timeout: 30000   # 풀에서 커넥션 못 얻으면 30초 후 타임아웃
-#      validation-timeout: 5000    # 커넥션 검증(SELECT 1) 최대 대기 5초
-#      connection-test-query: SELECT 1
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      max-lifetime: 600000        # 10분 (토큰 15분 만료 전에 교체)
+      idle-timeout: 600000        # 10분 (idle이 오래되면 닫기)
+      connection-timeout: 30000   # 풀에서 커넥션 못 얻으면 30초 후 타임아웃
+      validation-timeout: 5000    # 커넥션 검증(SELECT 1) 최대 대기 5초
+      connection-test-query: SELECT 1
 
   jpa:
     hibernate:
@@ -31,11 +31,6 @@ logging:
     root: INFO
     com.lawding.leavecalc: INFO
     software.aws.rds.jdbc: DEBUG
-
-app:
-  db:
-    host: ${RDS_HOST}
-    port: 3306
 
 internal:
   secret: ${INTERNAL_AUTH_SECRET}
