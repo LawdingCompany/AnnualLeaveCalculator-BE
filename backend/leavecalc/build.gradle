@@ -37,6 +37,10 @@ dependencies {
 
 	// AWS SDK (IAM 인증 토큰 발급용)
 	implementation "software.aws.rds:aws-mysql-jdbc:1.1.9"
+	// AWS SDK v2 (토큰 발급용, 버전대 2.x)
+	implementation "software.amazon.awssdk:rds:2.31.6"
+	implementation "software.amazon.awssdk:auth:2.31.6"
+	implementation "software.amazon.awssdk:sts:2.31.6"
 
 	// --- Lombok ---
 	compileOnly 'org.projectlombok:lombok'
