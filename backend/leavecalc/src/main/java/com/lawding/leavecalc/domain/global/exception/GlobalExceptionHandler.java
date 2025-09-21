@@ -175,20 +175,6 @@ public class GlobalExceptionHandler {
         ));
     }
 
-    // ---- 리소스 없음 → NOT_FOUND ----
-    @ExceptionHandler(ResourceNotFoundException.class) // 별도로 정의 필요
-    public ResponseEntity<ApiResponse<Void>> handleNotFound(
-        ResourceNotFoundException ex, HttpServletRequest req) {
-
-        log.error("NotFound at uri={}, msg={}, traceId={}", path(req), ex.getMessage(), traceId(), ex);
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(
-            ErrorCode.NOT_FOUND.getCode(),
-            ErrorCode.NOT_FOUND.getMessage(),
-            path(req), traceId()
-        ));
-    }
-
     // ---- 스프링 기본 ErrorResponseException → INVALID_INPUT or INTERNAL_ERROR ----
     @ExceptionHandler(ErrorResponseException.class)
     public ResponseEntity<ApiResponse<Void>> handleErrorResponse(
