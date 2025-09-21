@@ -48,11 +48,13 @@ public class DataSourceConfig {
         config.setPassword(authToken); // 토큰을 비밀번호처럼 전달
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        // 커넥션 풀 설정
+        // 풀 설정 (토큰 만료 15분 → 10분 이하로 교체)
         config.setMaximumPoolSize(5);
-        config.setConnectionTimeout(30000);
-        config.setMaxLifetime(600000); // 10분 (토큰 만료 15분보다 짧게)
-        config.setValidationTimeout(5000);
+        config.setMinimumIdle(0); // 유휴 상태
+        config.setMaxLifetime(600_000);   // 10분
+        config.setIdleTimeout(600_000);   // 10분
+        config.setConnectionTimeout(30_000); // 30초
+        config.setValidationTimeout(5_000); // 5초
 
         return new HikariDataSource(config);
     }
