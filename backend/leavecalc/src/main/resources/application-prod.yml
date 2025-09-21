@@ -15,6 +15,9 @@ spring:
       connection-timeout: 30000 # 30초 안에 커넥션 못 빌리면 실패
       validation-timeout: 5000 # 커넥션 검증 최대 5초
       connection-test-query: SELECT 1
+      data-source-properties:
+        iamAuthentication: true
+        awsRegion: ap-northeast-2
 
   jpa:
     hibernate:
