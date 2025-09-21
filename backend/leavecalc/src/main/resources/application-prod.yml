@@ -14,6 +14,8 @@ spring:
       connection-timeout: 30000   # 풀에서 커넥션 못 얻으면 30초 후 타임아웃
       validation-timeout: 5000    # 커넥션 검증(SELECT 1) 최대 대기 5초
       connection-test-query: SELECT 1
+      data-source-properties:
+        wrapperPlugins: iam
 
   jpa:
     hibernate:
