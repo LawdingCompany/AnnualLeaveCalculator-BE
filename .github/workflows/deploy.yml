@@ -53,7 +53,7 @@ jobs:
                 "docker pull '"$IMAGE"'",
                 "docker stop leavecalc || true",
                 "docker rm leavecalc || true",
-                "docker run -d --name leavecalc -p 8080:8080 --restart=always --log-driver=awslogs --log-opt awslogs-region=ap-northeast-2 --log-opt awslogs-group=/ec2/leavecalc --log-opt awslogs-create-group=true --log-opt awslogs-stream='"$INSTANCE_ID"'-leavecalc -e TZ=Asia/Seoul -e JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul -e SPRING_JACKSON_TIME_ZONE=Asia/Seoul -e SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=Asia/Seoul -e RDS_HOST=${{ secrets.RDS_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e INTERNAL_AUTH_SECRET=${{ secrets.INTERNAL_AUTH_SECRET }} '"$IMAGE"'",
+                "docker run -d --name leavecalc -p 8080:8080 --restart=always --log-driver=awslogs --log-opt awslogs-region=ap-northeast-2 --log-opt awslogs-group=/ec2/leavecalc --log-opt awslogs-create-group=true --log-opt awslogs-stream='"$INSTANCE_ID"'-leavecalc -e TZ=Asia/Seoul -e JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul -e SPRING_JACKSON_TIME_ZONE=Asia/Seoul -e SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=Asia/Seoul -e RDS_HOST=${{ secrets.RDS_HOST }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e INTERNAL_AUTH_SECRET=${{ secrets.INTERNAL_AUTH_SECRET }} -e AWS_REGION=${{ secrets.AWS_REGION }} '"$IMAGE"'",
                 "docker image prune -f || true"
               ]
             }'
