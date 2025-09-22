@@ -32,36 +32,54 @@ public class DataSourceConfig {
 
     @Bean
     public DataSource dataSource() {
-        RdsUtilities rdsUtilities = RdsUtilities.builder()
-            .region(Region.of(region))
-            .credentialsProvider(DefaultCredentialsProvider.create())
-            .build();
+        return new IamTokenHikariDataSource(host, port, dbName, username, region);
+    }
 
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false",
-            host, port, dbName));
-        config.setUsername(username);
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+    /**
+     * getPassword() 메서드를 오버라이드하여 매번 새로운 IAM 토큰 반환
+     */
+    static class IamTokenHikariDataSource extends HikariDataSource {
+        private final RdsUtilities rdsUtilities;
+        private final String host;
+        private final int port;
+        private final String username;
 
-        // 매번 새로운 토큰 생성 (권장 방식)
-        config.setPasswordSupplier(() ->
-            rdsUtilities.generateAuthenticationToken(
+        public IamTokenHikariDataSource(String host, int port, String dbName, String username, String region) {
+            super();
+
+            this.host = host;
+            this.port = port;
+            this.username = username;
+
+            this.rdsUtilities = RdsUtilities.builder()
+                .region(Region.of(region))
+                .credentialsProvider(DefaultCredentialsProvider.create())
+                .build();
+
+            HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false",
+                host, port, dbName));
+            config.setUsername(username);
+            config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+
+            config.setMaximumPoolSize(5);
+            config.setMinimumIdle(1);
+            config.setMaxLifetime(840_000);     // 14분(토큰 15분 만료 전에 교체)
+            config.setIdleTimeout(600_000);     // 10분(idle이 오래되면 닫기)
+            config.setConnectionTimeout(30_000); // 풀에서 커넥션 못 얻으면 30초 후 타임아웃
+            config.setValidationTimeout(5_000); //  커넥션 검증(SELECT 1) 최대 대기 5초
+            config.setConnectionTestQuery("SELECT 1");
+        }
+        @Override
+        public String getPassword() {
+            //  매번 호출될 때마다 새로운 IAM 토큰 생성
+            return rdsUtilities.generateAuthenticationToken(
                 GenerateAuthenticationTokenRequest.builder()
                     .hostname(host)
                     .port(port)
                     .username(username)
                     .build()
-            )
-        );
-
-        config.setMaximumPoolSize(5);
-        config.setMinimumIdle(1);
-        config.setMaxLifetime(840_000);
-        config.setIdleTimeout(600_000);
-        config.setConnectionTimeout(30_000);
-        config.setValidationTimeout(5_000);
-        config.setConnectionTestQuery("SELECT 1");
-
-        return new HikariDataSource(config);
+            );
+        }
     }
 }
