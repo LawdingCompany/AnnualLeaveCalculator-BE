@@ -37,29 +37,31 @@ public class DataSourceConfig {
             .credentialsProvider(DefaultCredentialsProvider.create())
             .build();
 
+        // IAM 토큰 생성
+        String authToken = rdsUtilities.generateAuthenticationToken(
+            GenerateAuthenticationTokenRequest.builder()
+                .hostname(host)
+                .port(port)
+                .username(username)
+                .build()
+        );
+
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s", host, port, dbName));
+
+        // SSL 필수 설정 추가
+        config.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false",
+            host, port, dbName));
         config.setUsername(username);
+        config.setPassword(authToken); // 생성된 IAM 토큰 설정
         config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 
-        // HikariCP 5.x 부터 가능한 setPasswordSupplier() 사용
-//        config.setPasswordSupplier(() ->
-//            rdsUtilities.generateAuthenticationToken(
-//                GenerateAuthenticationTokenRequest.builder()
-//                    .hostname(host)
-//                    .port(port)
-//                    .username(username)
-//                    .build()
-//            )
-//        );
-
-        // 풀 관련 설정
+        // IAM 토큰은 15분 만료되므로 연결 수명을 14분으로 설정
         config.setMaximumPoolSize(5);
         config.setMinimumIdle(1);
-        config.setMaxLifetime(600_000);   // 10분
-        config.setIdleTimeout(600_000);
-        config.setConnectionTimeout(30_000);
-        config.setValidationTimeout(5_000);
+        config.setMaxLifetime(840_000);     // 14분 (15분 만료 전에 갱신)
+        config.setIdleTimeout(600_000);     // 10분
+        config.setConnectionTimeout(30_000); // 30초
+        config.setValidationTimeout(5_000);  // 5초
         config.setConnectionTestQuery("SELECT 1");
 
         return new HikariDataSource(config);
