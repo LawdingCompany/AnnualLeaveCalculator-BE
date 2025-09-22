@@ -47,4 +47,5 @@ app:
     name : leave_calculator
 #    username : ${DB_USERNAME}
     username : leavecalc_ec2
+    region : ap-northeast-2
 #    region : ${AWS_REGION}
