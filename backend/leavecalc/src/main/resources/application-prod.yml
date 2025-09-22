@@ -2,21 +2,6 @@ spring:
   application:
     name: leavecalc
 
-#  datasource:
-##    url: jdbc:mysql:aws://${RDS_HOST}:3306/${DB_NAME}?wrapperPlugins=iam&sslMode=REQUIRED
-#    url: jdbc:mysql:aws://lawdingdb.cdsmiu2m0dc8.ap-northeast-2.rds.amazonaws.com:3306/leave_calculator?wrapperPlugins=iam&sslMode=REQUIRED
-#    username: leavecalc_ec2
-#    driver-class-name: software.aws.rds.jdbc.mysql.Driver
-
-#    hikari:
-#      maximum-pool-size: 5
-#      minimum-idle: 1
-#      max-lifetime: 600000        # 10분 (토큰 15분 만료 전에 교체)
-#      idle-timeout: 600000        # 10분 (idle이 오래되면 닫기)
-#      connection-timeout: 30000   # 풀에서 커넥션 못 얻으면 30초 후 타임아웃
-#      validation-timeout: 5000    # 커넥션 검증(SELECT 1) 최대 대기 5초
-#      connection-test-query: SELECT 1
-
   jpa:
     hibernate:
       ddl-auto: validate
@@ -35,17 +20,11 @@ logging:
     software.aws.rds.jdbc: DEBUG
 
 internal:
-  secret : "dfdf"
-#  secret: ${INTERNAL_AUTH_SECRET}
+  secret: ${INTERNAL_AUTH_SECRET}
 
 app:
   db:
-#    host : ${RDS_HOST}
-    host : lawdingdb.cdsmiu2m0dc8.ap-northeast-2.rds.amazonaws.com
-    port : 3306
-#    name : ${DB_NAME}
-    name : leave_calculator
-#    username : ${DB_USERNAME}
-    username : leavecalc_ec2
-    region : ap-northeast-2
-#    region : ${AWS_REGION}
+    host: ${RDS_HOST}
+    name: ${DB_NAME}
+    username: ${DB_USERNAME}
+    region: ${AWS_REGION}

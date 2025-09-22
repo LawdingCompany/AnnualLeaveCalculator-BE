@@ -37,9 +37,8 @@ dependencies {
 
 	// AWS SDK v2 (토큰 발급용, 버전대 2.x)
 	implementation 'software.amazon.awssdk:rds:2.25.63'
-//	implementation 'software.aws.rds:aws-mysql-jdbc:1.1.9'
 
-	// ✅ MySQL JDBC Driver
+	// MySQL JDBC Driver
 	runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
 
 	// --- Lombok ---
