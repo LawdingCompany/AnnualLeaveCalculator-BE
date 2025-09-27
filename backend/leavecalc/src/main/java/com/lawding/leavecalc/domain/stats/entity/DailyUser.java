@@ -1,5 +1,6 @@
 package com.lawding.leavecalc.domain.stats.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import java.time.LocalDate;
@@ -13,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class DailyUser {
 
     @Id
-    private LocalDate date;
+    @Column(name = "record_date")
+    private LocalDate recordDate;
 
     private int web;
     private int ios;

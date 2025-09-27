@@ -6,14 +6,14 @@ import lombok.Builder;
 
 @Builder
 public record DailyUserDto (
-    LocalDate date,
+    LocalDate recordDate,
     int web,
     int ios
 )
 {
     public static DailyUserDto from(DailyUser entity){
         return DailyUserDto.builder()
-            .date(entity.getDate())
+            .recordDate(entity.getRecordDate())
             .web(entity.getWeb())
             .ios(entity.getIos())
             .build();
