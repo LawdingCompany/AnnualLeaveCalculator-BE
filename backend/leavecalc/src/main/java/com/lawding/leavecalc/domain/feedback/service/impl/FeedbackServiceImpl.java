@@ -1,10 +1,12 @@
 package com.lawding.leavecalc.domain.feedback.service.impl;
 
+import com.lawding.leavecalc.domain.feedback.dto.FeedbackDto;
 import com.lawding.leavecalc.domain.feedback.dto.request.FeedbackRequest;
 import com.lawding.leavecalc.domain.feedback.entity.Feedback;
 import com.lawding.leavecalc.domain.feedback.repository.FeedbackRepository;
 import com.lawding.leavecalc.domain.feedback.service.FeedbackService;
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -37,5 +39,12 @@ public class FeedbackServiceImpl implements FeedbackService {
         }
         feedbackRepository.save(feedback);
         log.debug("피드백 저장 완료 : {}", feedback.getId());
+    }
+
+    @Override
+    public List<FeedbackDto> getAllFeedback() {
+        return feedbackRepository.findAll().stream()
+            .map(FeedbackDto::from)
+            .toList();
     }
 }
