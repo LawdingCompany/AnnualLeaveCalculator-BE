@@ -8,6 +8,7 @@ public enum FeedbackType {
     ERROR_REPORT("오류 제보"),
     IMPROVEMENT("개선 요청"),
     QUESTION("문의"),
+    SATISFACTION("이용 만족도"),
     OTHER("기타");
 
     private final String label;

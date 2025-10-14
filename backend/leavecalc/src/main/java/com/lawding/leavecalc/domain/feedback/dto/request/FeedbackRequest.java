@@ -12,10 +12,8 @@ import jakarta.validation.constraints.Size;
 public record FeedbackRequest(
     @NotNull
     FeedbackType type,
-    @NotBlank(message = "내용을 입력해주세요.")
-    @Size(min = 5, max = 1000)
+    @Size(max = 1000)
     String content,
-
     @Email @Size(max = 255)
     String email,
     @Min(1) @Max(5)

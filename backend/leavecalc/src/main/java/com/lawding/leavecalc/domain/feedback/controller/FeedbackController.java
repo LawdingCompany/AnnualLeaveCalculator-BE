@@ -33,7 +33,6 @@ public class FeedbackController {
     }
 
     @PostMapping
-
     public ResponseEntity<ApiResponse<Void>> createFeedback(
         @Valid @RequestBody FeedbackRequest request,
         @RequestHeader(value = "X-Platform") Platform platform,
