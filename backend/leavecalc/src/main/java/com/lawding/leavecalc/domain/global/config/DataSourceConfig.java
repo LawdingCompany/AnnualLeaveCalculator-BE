@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.rds.RdsUtilities;
@@ -13,6 +14,7 @@ import software.amazon.awssdk.services.rds.model.GenerateAuthenticationTokenRequ
 
 import javax.sql.DataSource;
 
+@Profile("prod")
 @Configuration
 public class DataSourceConfig {
 
@@ -57,7 +59,6 @@ public class DataSourceConfig {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
 
-            HikariConfig config = new HikariConfig();
             this.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false",
                 host, port, dbName));
             this.setUsername(username);

@@ -1,6 +1,5 @@
 package com.lawding.leavecalc.domain.feedback.entity;
 
-import com.lawding.leavecalc.domain.feedback.entity.FeedbackType;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
