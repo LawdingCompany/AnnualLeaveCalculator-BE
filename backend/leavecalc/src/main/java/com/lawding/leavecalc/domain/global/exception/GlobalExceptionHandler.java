@@ -43,8 +43,11 @@ public class GlobalExceptionHandler {
         MethodArgumentNotValidException ex, HttpServletRequest req) {
 
         String msg = ex.getBindingResult().getFieldErrors().stream()
-            .map(fe -> fe.getField() + ": " +
-                       (fe.getDefaultMessage() == null ? "유효하지 않습니다." : fe.getDefaultMessage()))
+            .map(fe -> {
+                fe.getDefaultMessage();
+                return fe.getField() + ": " +
+                       fe.getDefaultMessage();
+            })
             .collect(Collectors.joining(", "));
 
         log.error("Validation failed at uri={}, errors={}, traceId={}",

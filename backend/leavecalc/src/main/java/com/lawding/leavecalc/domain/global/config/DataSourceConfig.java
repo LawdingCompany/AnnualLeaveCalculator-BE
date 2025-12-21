@@ -59,7 +59,7 @@ public class DataSourceConfig {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
 
-            this.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false",
+            this.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false&serverTimezone=Asia/Seoul",
                 host, port, dbName));
             this.setUsername(username);
             this.setDriverClassName("com.mysql.cj.jdbc.Driver");
