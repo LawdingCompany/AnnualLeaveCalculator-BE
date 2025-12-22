@@ -4,10 +4,11 @@ WORKDIR /app
 
 # 1) 캐시 최적화: 먼저 래퍼/세팅 파일만 복사
 COPY gradlew gradle gradle.* ./
-RUN chmod +x gradlew
 
 # 2) 소스 복사
 COPY . .
+
+RUN chmod +x gradlew
 
 # 3) 빌드
 RUN ./gradlew clean build -x test --no-daemon
