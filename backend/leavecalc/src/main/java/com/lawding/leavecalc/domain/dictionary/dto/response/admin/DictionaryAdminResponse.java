@@ -4,7 +4,7 @@ import com.lawding.leavecalc.domain.dictionary.category.dto.response.DictionaryC
 import com.lawding.leavecalc.domain.dictionary.entity.Dictionary;
 import java.time.LocalDateTime;
 
-public record DictionaryAdminResponse(Long id, DictionaryCategoryResponse categoryDto, String question,
+public record DictionaryAdminResponse(Long id, DictionaryCategoryResponse category, String question,
                                       String content, boolean deleted, LocalDateTime deletedAt) {
 
     public static DictionaryAdminResponse from(Dictionary dictionary) {

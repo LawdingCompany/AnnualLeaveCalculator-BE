@@ -48,6 +48,14 @@ public class DictionaryCategoryServiceImpl implements DictionaryCategoryService 
         DictionaryCategory category = categoryRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException(
                 "카테고리 항목이 존재하지 않습니다. id =" + id));
+
+        DictionaryCategory defaultCategory = categoryRepository.findByName("기타")
+            .orElseThrow(() -> new IllegalArgumentException("기본 카테고리(기타)가 존재하지 않습니다."));
+
+        if (category.getId().equals(defaultCategory.getId())) {
+            throw new IllegalArgumentException("기본 카테고리는 수정할 수 없습니다.");
+        }
+
         if (categoryRepository.existsByNameAndIdNot(request.name(), id)) {
             throw new IllegalArgumentException("이미 존재하는 카테고리입니다.");
         }
