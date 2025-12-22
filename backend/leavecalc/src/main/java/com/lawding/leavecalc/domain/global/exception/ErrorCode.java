@@ -16,6 +16,7 @@ public enum ErrorCode {
     // --- Domain ---
     FEEDBACK_TYPE_CONVERT_LABEL_ERROR(3001, HttpStatus.BAD_REQUEST, "알려지지 않은 피드백 유형입니다.");
 
+
     private final int code;
     private final HttpStatus httpStatus;
     private final String message;
