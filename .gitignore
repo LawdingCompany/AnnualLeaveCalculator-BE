@@ -1,0 +1,109 @@
+################################
+# IDE (IntelliJ / STS / VSCode)
+################################
+.idea/
+**/.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.vscode/
+
+################################
+# Java / Spring / Build Output
+################################
+*.class
+*.log
+bin/
+out/
+build/
+**/build/
+**/out/
+**/bin/
+target/
+**/target/
+
+################################
+# Gradle
+################################
+.gradle/
+**/.gradle/
+**/caches/
+**/*.lock
+**/wrapper/dists/
+# Gradle Wrapper는 커밋해야 함
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+!gradlew
+!gradlew.bat
+
+################################
+# Gradle Toolchains / Cache
+################################
+jdks/
+native/
+daemon/
+
+################################
+# Temporary files
+################################
+.tmp/
+**/.tmp/
+*.tmp
+*.swp
+*.bak
+
+################################
+# Frontend (React / Vite 등)
+################################
+node_modules/
+dist/
+.vite/
+*.local
+
+################################
+# Test / Coverage
+################################
+coverage/
+*.exec
+*.ec
+.jacoco/
+
+################################
+# OS
+################################
+.DS_Store
+Thumbs.db
+*.pid
+
+################################
+# Environment / Config
+################################
+.env
+.env.*
+application-dev.yml
+application-local.yml
+!application-prod.yml
+!application.yml
+secrets/
+
+################################
+# Logs
+################################
+logs/
+*.log.*
+
+################################
+# Sonar / 기타 플러그인
+################################
+.idea/**/sonarlint/
+.idea/**/sonarIssues.xml
+
+################################
+# 기타
+################################
+HELP.md
