@@ -24,6 +24,8 @@ build/
 **/build/
 **/out/
 **/bin/
+target/
+**/target/
 
 ################################
 # Gradle
@@ -32,35 +34,68 @@ build/
 **/.gradle/
 **/caches/
 **/*.lock
-**/gradle/wrapper/dists/
-
+**/wrapper/dists/
 # Gradle Wrapper는 커밋해야 함
-!gradle/wrapper/gradle-wrapper.jar
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+!gradlew
+!gradlew.bat
+
+################################
+# Gradle Toolchains / Cache
+################################
+jdks/
+native/
+daemon/
+
+################################
+# Temporary files
+################################
+.tmp/
+**/.tmp/
+*.tmp
+*.swp
+*.bak
 
 ################################
 # Frontend (React / Vite 등)
 ################################
 node_modules/
 dist/
+.vite/
+*.local
+
+################################
+# Test / Coverage
+################################
+coverage/
+*.exec
+*.ec
+.jacoco/
 
 ################################
 # OS
 ################################
 .DS_Store
 Thumbs.db
+*.pid
 
 ################################
 # Environment / Config
 ################################
 .env
 .env.*
-
-# 로컬/개발 설정은 무시
 application-dev.yml
 application-local.yml
-
-# 운영 설정만 예외 허용 (원하면)
 !application-prod.yml
+!application.yml
+secrets/
+
+################################
+# Logs
+################################
+logs/
+*.log.*
 
 ################################
 # Sonar / 기타 플러그인
