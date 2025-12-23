@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/admin/dictionaries")
+@RequestMapping("/admin/dictionaries")
 public class DictionaryAdminController {
 
     private final DictionaryService dictionaryService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DictionaryAdminResponse>>> getAllDictionaries() {
-        log.info("GET /api/admin/dictionaries - 연차 백과사전 전체 리스트 요청 for 관리자");
+        log.info("GET /admin/dictionaries - 연차 백과사전 전체 리스트 요청 for 관리자");
         return ResponseEntity.ok(
             ApiResponse.ok(
                 dictionaryService.findAllDictionaries()
@@ -40,7 +40,7 @@ public class DictionaryAdminController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DictionaryAdminResponse>> getDictionary(
         @PathVariable Long id) {
-        log.info("GET /api/admin/dictionaries/{} - 연차 백과사전 항목({}) 요청 for 관리자", id, id);
+        log.info("GET /admin/dictionaries/{} - 연차 백과사전 항목({}) 요청 for 관리자", id, id);
         return ResponseEntity.ok(
             ApiResponse.ok(
                 DictionaryAdminResponse.from(
@@ -52,7 +52,7 @@ public class DictionaryAdminController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> createDictionary(
         @RequestBody @Valid DictionaryRequest request) {
-        log.info("POST /api/admin/dictionaries - 연차 백과사전 생성 요청");
+        log.info("POST /admin/dictionaries - 연차 백과사전 생성 요청");
         dictionaryService.createDictionary(request);
         return ResponseEntity.ok(ApiResponse.okMessage("사전에 등록되었습니다."));
     }
@@ -60,19 +60,19 @@ public class DictionaryAdminController {
     public ResponseEntity<ApiResponse<Void>> updateDictionary(
         @PathVariable Long id,
         @RequestBody @Valid DictionaryRequest request) {
-        log.info("PATCH /api/admin/dictionaries/{} - 연차 백과사전 항목({}) 수정 요청", id, id);
+        log.info("PATCH /admin/dictionaries/{} - 연차 백과사전 항목({}) 수정 요청", id, id);
         dictionaryService.updateDictionary(id, request);
         return ResponseEntity.ok(ApiResponse.okMessage("사전 항목이 수정되었습니다."));
     }
     @PatchMapping("/{id}/disable")
     public ResponseEntity<ApiResponse<Void>> disableDictionary(@PathVariable Long id) {
-        log.info("PATCH /api/admin/dictionaries/{}/disable - 연차 백과사전 항목({}) 비활성화 요청", id, id);
+        log.info("PATCH /admin/dictionaries/{}/disable - 연차 백과사전 항목({}) 비활성화 요청", id, id);
         dictionaryService.disableDictionary(id);
         return ResponseEntity.ok(ApiResponse.okMessage("사전 항목이 비활성화되었습니다."));
     }
     @PatchMapping("/{id}/enable")
     public ResponseEntity<ApiResponse<Void>> enableDictionary(@PathVariable Long id) {
-        log.info("PATCH /api/admin/dictionaries/{}/enable - 연차 백과사전 항목({}) 활성화 요청", id, id);
+        log.info("PATCH /admin/dictionaries/{}/enable - 연차 백과사전 항목({}) 활성화 요청", id, id);
         dictionaryService.enableDictionary(id);
         return ResponseEntity.ok(ApiResponse.okMessage("사전 항목이 활성화되었습니다."));
     }
