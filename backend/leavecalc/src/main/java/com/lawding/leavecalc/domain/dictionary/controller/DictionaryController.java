@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/dictionaries")
+@RequestMapping("/dictionaries")
 public class DictionaryController {
 
     private final DictionaryService dictionaryService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DictionaryResponse>>> getActiveDictionaries() {
-        log.info("GET /api/dictionary - 연차 백과사전 전체 리스트 요청");
+        log.info("GET /dictionary - 연차 백과사전 전체 리스트 요청");
         return ResponseEntity.ok(
             ApiResponse.ok(
                 dictionaryService.findActiveDictionaries().stream()
@@ -34,7 +34,7 @@ public class DictionaryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponse>> getActiveDictionary(@PathVariable Long id) {
-        log.info("GET /api/dictionary/{} - 연차 백과사전 항목({}) 요청", id, id);
+        log.info("GET /dictionary/{} - 연차 백과사전 항목({}) 요청", id, id);
         return ResponseEntity.ok(
             ApiResponse.ok(
                 DictionaryResponse.from(
