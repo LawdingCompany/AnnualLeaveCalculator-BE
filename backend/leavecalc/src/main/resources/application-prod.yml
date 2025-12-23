@@ -1,6 +1,10 @@
 spring:
   application:
-    name: leavecalc
+    name:
+
+server:
+  servlet:
+    context-path: /v1
 
   jpa:
     hibernate:
