@@ -36,7 +36,10 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	// AWS SDK v2 (토큰 발급용, 버전대 2.x)
-	implementation 'software.amazon.awssdk:rds:2.25.63'
+	implementation platform("software.amazon.awssdk:bom:2.31.6")
+	implementation "software.amazon.awssdk:rds"
+	implementation "software.amazon.awssdk:dynamodb"
+	implementation "software.amazon.awssdk:dynamodb-enhanced"
 
 	// DB Driver : h2, MySQL JDBC Driver
 	runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
