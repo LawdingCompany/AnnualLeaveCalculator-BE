@@ -127,6 +127,6 @@ public class AppVersionAdminController {
         log.info("DELETE /admin/app-versions/{} - {} 정책 삭제", platform.getValue(),
             platform.getValue());
         appVersionService.deleteAppVersionPolicy(platform);
-        return ResponseEntity.ok(ApiResponse.okMessage("해당 앱 정책이 수정되었습니다."));
+        return ResponseEntity.ok(ApiResponse.okMessage("애플리케이션 정책이 삭제되었습니다."));
     }
 }
