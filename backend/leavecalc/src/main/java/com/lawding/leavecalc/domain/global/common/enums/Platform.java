@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum Platform {
     WEB("web"),
     IOS("ios"),
-    OTHER("other");
+    ANDROID("android");
 
     private final String value;
 
