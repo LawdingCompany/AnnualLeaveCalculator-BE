@@ -2,7 +2,8 @@ package com.lawding.leavecalc.domain.dictionary.controller;
 
 import com.lawding.leavecalc.domain.dictionary.service.DictionaryService;
 import com.lawding.leavecalc.domain.dictionary.dto.response.DictionaryResponse;
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.PageResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -33,13 +35,28 @@ public class DictionaryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<DictionaryResponse>> getActiveDictionary(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<DictionaryResponse>> getActiveDictionary(
+        @PathVariable Long id) {
         log.info("GET /dictionary/{} - 연차 백과사전 항목({}) 요청", id, id);
         return ResponseEntity.ok(
             ApiResponse.ok(
                 DictionaryResponse.from(
                     dictionaryService.findActiveDictionary(id)
                 )
+            )
+        );
+    }
+
+    // /search?keyword={}&page={}&size={}
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<PageResponse<?>>> searchDictionaries(
+        @RequestParam String keyword,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "6") int size
+    ) {
+        return ResponseEntity.ok(
+            ApiResponse.ok(
+                null
             )
         );
     }

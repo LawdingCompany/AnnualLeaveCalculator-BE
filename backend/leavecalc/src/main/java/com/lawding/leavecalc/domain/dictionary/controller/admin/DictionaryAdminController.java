@@ -3,7 +3,7 @@ package com.lawding.leavecalc.domain.dictionary.controller.admin;
 import com.lawding.leavecalc.domain.dictionary.dto.response.admin.DictionaryAdminResponse;
 import com.lawding.leavecalc.domain.dictionary.dto.request.admin.DictionaryRequest;
 import com.lawding.leavecalc.domain.dictionary.service.DictionaryService;
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
