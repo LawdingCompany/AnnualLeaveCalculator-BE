@@ -1,7 +1,7 @@
 package com.lawding.leavecalc.domain.global.exception;
 
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Arrays;

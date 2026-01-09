@@ -1,4 +1,4 @@
-package com.lawding.leavecalc.domain.global.common.response;
+package com.lawding.leavecalc.domain.global.common.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

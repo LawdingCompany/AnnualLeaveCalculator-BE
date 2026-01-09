@@ -1,6 +1,6 @@
 package com.lawding.leavecalc.domain.stats.controller;
 
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import com.lawding.leavecalc.domain.stats.dto.DailyUserDto;
 import com.lawding.leavecalc.domain.stats.service.UserStatsService;
 import java.util.List;
