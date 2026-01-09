@@ -3,7 +3,7 @@ package com.lawding.leavecalc.domain.appversion.controller;
 import com.lawding.leavecalc.domain.appversion.dto.response.AppVersionResponse;
 import com.lawding.leavecalc.domain.appversion.service.AppVersionService;
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +30,10 @@ public class AppVersionController {
         @Pattern(
             regexp = "^\\d+\\.\\d+\\.\\d+$",
             message = "client-version은 X.X.X 형식이어야 합니다"
-        )String clientVersion
+        ) String clientVersion
     ) {
-        log.info("GET /app/version-check?platform={}&client-version={} - 앱버전 체크 요청", platform, clientVersion);
+        log.info("GET /app/version-check?platform={}&client-version={} - 앱버전 체크 요청", platform,
+            clientVersion);
 
         return ResponseEntity.ok(
             ApiResponse.ok(
