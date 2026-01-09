@@ -8,7 +8,7 @@ import com.lawding.leavecalc.domain.appversion.dto.request.admin.UpdateUpdateMes
 import com.lawding.leavecalc.domain.appversion.dto.response.admin.AppVersionAdminResponse;
 import com.lawding.leavecalc.domain.appversion.service.AppVersionService;
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
