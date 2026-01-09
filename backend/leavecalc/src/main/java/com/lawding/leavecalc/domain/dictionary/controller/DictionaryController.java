@@ -1,12 +1,16 @@
 package com.lawding.leavecalc.domain.dictionary.controller;
 
+import com.lawding.leavecalc.domain.dictionary.entity.Dictionary;
 import com.lawding.leavecalc.domain.dictionary.service.DictionaryService;
 import com.lawding.leavecalc.domain.dictionary.dto.response.DictionaryResponse;
 import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import com.lawding.leavecalc.domain.global.common.dto.response.PageResponse;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,16 +51,22 @@ public class DictionaryController {
         );
     }
 
-    // /search?keyword={}&page={}&size={}
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<PageResponse<?>>> searchDictionaries(
-        @RequestParam String keyword,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "6") int size
+    public ResponseEntity<ApiResponse<PageResponse<DictionaryResponse>>> searchDictionaries(
+        @RequestParam @Size(max = 20) String keyword,
+        @RequestParam(defaultValue = "0") @Min(0) int page,
+        @RequestParam(defaultValue = "6") @Min(1) int size
     ) {
+        log.info("GET /search?keyword={}&page={}&size={} - 연차 백과사전 검색 키워드 = {}, 페이지 = {}, 크기 = {}",
+            keyword, page, size, keyword, page, size);
+
+        Page<Dictionary> result = dictionaryService.searchDictionaries(keyword, page, size);
+
         return ResponseEntity.ok(
             ApiResponse.ok(
-                null
+                PageResponse.from(
+                    result.map(DictionaryResponse::from)
+                )
             )
         );
     }

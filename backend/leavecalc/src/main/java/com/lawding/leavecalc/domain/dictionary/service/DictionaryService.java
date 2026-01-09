@@ -1,8 +1,11 @@
 package com.lawding.leavecalc.domain.dictionary.service;
 
 import com.lawding.leavecalc.domain.dictionary.dto.request.admin.DictionaryRequest;
+import com.lawding.leavecalc.domain.dictionary.dto.response.DictionaryResponse;
 import com.lawding.leavecalc.domain.dictionary.entity.Dictionary;
+import com.lawding.leavecalc.domain.global.common.dto.response.PageResponse;
 import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface DictionaryService {
 
@@ -21,4 +24,6 @@ public interface DictionaryService {
     List<Dictionary> findActiveDictionaries();
 
     Dictionary findActiveDictionary(Long id);
+
+    Page<Dictionary> searchDictionaries(String keyword, int page, int size);
 }

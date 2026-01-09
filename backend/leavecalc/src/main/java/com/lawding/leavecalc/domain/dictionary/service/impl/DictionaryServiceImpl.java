@@ -1,14 +1,19 @@
 package com.lawding.leavecalc.domain.dictionary.service.impl;
 
 import com.lawding.leavecalc.domain.dictionary.dto.request.admin.DictionaryRequest;
+import com.lawding.leavecalc.domain.dictionary.dto.response.DictionaryResponse;
 import com.lawding.leavecalc.domain.dictionary.entity.Dictionary;
 import com.lawding.leavecalc.domain.dictionary.category.entity.DictionaryCategory;
 import com.lawding.leavecalc.domain.dictionary.category.repository.DictionaryCategoryRepository;
 import com.lawding.leavecalc.domain.dictionary.repository.DictionaryRepository;
 import com.lawding.leavecalc.domain.dictionary.service.DictionaryService;
+import com.lawding.leavecalc.domain.global.common.dto.response.PageResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,11 +37,31 @@ public class DictionaryServiceImpl implements DictionaryService {
     public List<Dictionary> findActiveDictionaries() {
         return dictionaryRepository.findAllByDeletedFalse();
     }
+
     @Transactional(readOnly = true)
     @Override
     public Dictionary findActiveDictionary(Long id) {
         return dictionaryRepository.findByIdAndDeletedFalse(id)
             .orElseThrow(() -> new IllegalArgumentException("사전 항목이 존재하지 않습니다. id = " + id));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<Dictionary> searchDictionaries(String keyword, int page, int size) {
+        validateSearchCondition(keyword);
+        Pageable pageable = PageRequest.of(page, size);
+
+        return dictionaryRepository.search(keyword, pageable);
+
+    }
+
+    private void validateSearchCondition(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new IllegalArgumentException("검색어를 입력해주세요.");
+        }
+        if (keyword.length() < 2) {
+            throw new IllegalArgumentException("검색어는 최소 2자 이상 입력해주세요.");
+        }
     }
 
     @Transactional(readOnly = true)
