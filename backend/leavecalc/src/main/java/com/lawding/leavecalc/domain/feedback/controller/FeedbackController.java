@@ -4,7 +4,7 @@ import com.lawding.leavecalc.domain.feedback.dto.FeedbackDto;
 import com.lawding.leavecalc.domain.feedback.dto.request.FeedbackRequest;
 import com.lawding.leavecalc.domain.feedback.service.FeedbackService;
 import com.lawding.leavecalc.domain.global.common.enums.Platform;
-import com.lawding.leavecalc.domain.global.common.response.ApiResponse;
+import com.lawding.leavecalc.domain.global.common.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
