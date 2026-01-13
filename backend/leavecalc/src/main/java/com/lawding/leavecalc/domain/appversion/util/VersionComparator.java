@@ -6,7 +6,7 @@ public class VersionComparator {
 
     }
 
-    public static boolean isLower(String v1, String v2) {
+    public static int compare(String v1, String v2) {
         String[] a = v1.split("\\.");
         String[] b = v2.split("\\.");
 
@@ -14,10 +14,10 @@ public class VersionComparator {
             int n1 = Integer.parseInt(a[i]);
             int n2 = Integer.parseInt(b[i]);
             if (n1 != n2) {
-                return n1 < n2;
+                return Integer.compare(n1, n2);
             }
         }
-        return false;
+        return 0;
     }
 
 }
