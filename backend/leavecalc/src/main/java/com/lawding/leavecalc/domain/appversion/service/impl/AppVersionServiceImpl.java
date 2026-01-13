@@ -24,7 +24,7 @@ public class AppVersionServiceImpl implements AppVersionService {
     public AppVersionInfo checkVersion(Platform platform, String clientVersion) {
         AppVersion policy = findPolicyOrThrow(platform);
 
-        boolean forceUpdate = VersionComparator.isLower(clientVersion, policy.getMinimumVersion());
+        boolean forceUpdate = VersionComparator.compare(clientVersion, policy.getMinimumVersion()) < 0;
 
         return AppVersionInfo.from(policy, forceUpdate);
     }
