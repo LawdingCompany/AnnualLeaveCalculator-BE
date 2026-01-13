@@ -54,11 +54,11 @@ public class AppVersion {
     }
 
     public void changeMinimumVersion(String version) {
-        if (VersionComparator.isLower(version, this.currentVersion)) {
+        if (VersionComparator.compare(version, this.currentVersion) > 0) {
             throw new IllegalArgumentException(
                 "minimumVersion(" + version +
                 ")은 currentVersion(" + this.currentVersion +
-                ")보다 낮을 수 없습니다."
+                ")보다 클 수 없습니다."
             );
         }
         this.minimumVersion = version;
