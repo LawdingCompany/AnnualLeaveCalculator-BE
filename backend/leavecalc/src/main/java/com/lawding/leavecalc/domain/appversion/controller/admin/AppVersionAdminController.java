@@ -33,7 +33,7 @@ public class AppVersionAdminController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<AppVersionAdminResponse>>> getAllAppVersion() {
-        log.info("GET /admin/app-versions - 모든 앱 정책 정보 요청");
+        log.info("[req] GET /admin/app-versions - 모든 앱 정책 정보 요청");
         return ResponseEntity.ok(
             ApiResponse.ok(
                 appVersionService.findAllAppVersion()
@@ -47,8 +47,7 @@ public class AppVersionAdminController {
     @GetMapping("{platform}")
     public ResponseEntity<ApiResponse<AppVersionAdminResponse>> getAppVersion(
         @PathVariable Platform platform) {
-        log.info("GET /admin/app-versions/{} - {} 정책 정보 요청", platform.getValue(),
-            platform.getValue());
+        log.info("[req] GET /admin/app-versions/[platform] - {} 정책 정보 요청", platform.getValue());
         return ResponseEntity.ok(
             ApiResponse.ok(
                 AppVersionAdminResponse.from(
@@ -62,7 +61,7 @@ public class AppVersionAdminController {
     public ResponseEntity<ApiResponse<Void>> createAppVersion(
         @Valid @RequestBody AppVersionRequest request
     ) {
-        log.info("POST /admin/app-versions - {} 정책 등록/수정 : {}", request.platform().getValue(),
+        log.info("[req] POST /admin/app-versions - {} 정책 등록/수정 : {}", request.platform().getValue(),
             request);
         appVersionService.createAppVersionPolicy(request);
         return ResponseEntity.ok(ApiResponse.okMessage("애플리케이션 버전이 등록되었습니다."));
@@ -73,8 +72,8 @@ public class AppVersionAdminController {
         @PathVariable Platform platform,
         @Valid @RequestBody UpdateCurrentVersionRequest request
     ) {
-        log.info("PATCH /admin/app-versions/{}/current-version - {} 최신 버전 수정 : {}",
-            platform.getValue(), platform.getValue(), request.currentVersion());
+        log.info("[req] PATCH /admin/app-versions/[platform]/current-version - {} 최신 버전 수정 : {}",
+            platform.getValue(), request.currentVersion());
 
         appVersionService.updateCurrentVersion(platform, request.currentVersion());
 
@@ -86,8 +85,8 @@ public class AppVersionAdminController {
         @PathVariable Platform platform,
         @Valid @RequestBody UpdateMinimumVersionRequest request
     ) {
-        log.info("PATCH /admin/app-versions/{}/minimum-version - {} 최소 버전 수정 : {}",
-            platform.getValue(), platform.getValue(), request.minimumVersion());
+        log.info("[req] PATCH /admin/app-versions/[platform]/minimum-version - {} 최소 버전 수정 : {}",
+            platform.getValue(), request.minimumVersion());
 
         appVersionService.updateMinimumVersion(platform, request.minimumVersion());
 
@@ -99,8 +98,8 @@ public class AppVersionAdminController {
         @PathVariable Platform platform,
         @Valid @RequestBody UpdateUpdateMessageRequest request
     ) {
-        log.info("PATCH /admin/app-versions/{}/update-message - {} 업데이트 메시지 수정 : {}",
-            platform.getValue(), platform.getValue(), request.updateMessage());
+        log.info("[req] PATCH /admin/app-versions/[platform]/update-message - {} 업데이트 메시지 수정 : {}",
+            platform.getValue(), request.updateMessage());
 
         appVersionService.updateUpdateMessage(platform, request.updateMessage());
 
@@ -112,8 +111,8 @@ public class AppVersionAdminController {
         @PathVariable Platform platform,
         @Valid @RequestBody UpdateDownloadUrlRequest request
     ) {
-        log.info("PATCH /admin/app-versions/{}/download-url - {} 다운로드 url 수정 : {}",
-            platform.getValue(), platform.getValue(), request.downloadUrl());
+        log.info("[req] PATCH /admin/app-versions/[platform]/download-url - {} 다운로드 url 수정 : {}",
+            platform.getValue(), request.downloadUrl());
 
         appVersionService.updateDownloadUrl(platform, request.downloadUrl());
 
@@ -124,8 +123,7 @@ public class AppVersionAdminController {
     public ResponseEntity<ApiResponse<Void>> deleteAppVersion(
         @PathVariable Platform platform
     ) {
-        log.info("DELETE /admin/app-versions/{} - {} 정책 삭제", platform.getValue(),
-            platform.getValue());
+        log.info("[req] DELETE /admin/app-versions/[platform] - {} 정책 삭제", platform.getValue());
         appVersionService.deleteAppVersionPolicy(platform);
         return ResponseEntity.ok(ApiResponse.okMessage("애플리케이션 정책이 삭제되었습니다."));
     }

@@ -21,7 +21,7 @@ public class UserStatsController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DailyUserDto>>> getAllDailyUser() {
-        log.info("GET /stats - 모든 이용자 수 조회 요청");
+        log.info("[req] GET /stats - 모든 이용자 수 조회 요청");
         List<DailyUserDto> stats = userStatsService.getAllDailyUser();
         log.info("전체 일자별 이용자 수 조회 완료: 총 {}건", stats.size());
         return ResponseEntity.ok(ApiResponse.ok(stats));
