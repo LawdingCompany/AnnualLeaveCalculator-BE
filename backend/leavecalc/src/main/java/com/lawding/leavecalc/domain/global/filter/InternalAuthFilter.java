@@ -30,7 +30,6 @@ public class InternalAuthFilter extends HttpFilter {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             return;
         }
-        log.info("정상적인 요청 인증, URI = {}", request.getRequestURI());
         chain.doFilter(request, response);
     }
 }

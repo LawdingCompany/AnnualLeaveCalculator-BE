@@ -27,8 +27,8 @@ public class FeedbackController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<FeedbackDto>>> getAllFeedback(){
+        log.info("GET /feedback - 피드백 전체 조회 요청");
         List<FeedbackDto> feedbackList = feedbackService.getAllFeedback();
-        log.info("피드백 전체 조회: {}건", feedbackList.size());
         return ResponseEntity.ok(ApiResponse.ok(feedbackList));
     }
 
@@ -37,6 +37,7 @@ public class FeedbackController {
         @Valid @RequestBody FeedbackRequest request,
         @RequestHeader(value = "X-Platform") Platform platform,
         @RequestHeader(value = "X-Test", required = false) Boolean isTest) {
+        log.info("POST /feedback - 피드백 등록");
         log.debug("피드백 요청 수신 : {}, platform = {} isTest = {}", request, platform, isTest);
         feedbackService.createFeedback(request, platform, isTest);
         return ResponseEntity.ok(ApiResponse.okMessage("피드백이 등록되었습니다."));
