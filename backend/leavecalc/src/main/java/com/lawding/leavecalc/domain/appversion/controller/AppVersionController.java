@@ -32,8 +32,7 @@ public class AppVersionController {
             message = "client-version은 X.X.X 형식이어야 합니다"
         ) String clientVersion
     ) {
-        log.info("GET /app/version-check?platform={}&client-version={} - 앱버전 체크 요청", platform,
-            clientVersion);
+        log.info("[req] GET /app/version-check?platform=[]&client-version=[] - 앱버전 체크 요청");
 
         return ResponseEntity.ok(
             ApiResponse.ok(
