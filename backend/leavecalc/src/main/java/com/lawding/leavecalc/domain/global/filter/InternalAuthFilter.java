@@ -17,6 +17,7 @@ public class InternalAuthFilter extends HttpFilter {
     public InternalAuthFilter(String internalSecret) {
         this.internalSecret = internalSecret;
     }
+
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response,
         FilterChain chain) throws IOException, ServletException {
@@ -29,7 +30,7 @@ public class InternalAuthFilter extends HttpFilter {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
             return;
         }
-        log.debug("정상적인 요청 인증");
+        log.info("정상적인 요청 인증, URI = {}", request.getRequestURI());
         chain.doFilter(request, response);
     }
 }
