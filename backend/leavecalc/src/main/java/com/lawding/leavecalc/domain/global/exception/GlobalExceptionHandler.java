@@ -97,7 +97,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<ApiResponse<Void>> handleMissingHeader(
         MissingRequestHeaderException ex, HttpServletRequest req) {
-
         if ("X-Platform".equalsIgnoreCase(ex.getHeaderName())) {
             log.error("Missing X-Platform header at uri={}, traceId={}", path(req), traceId(), ex);
 
