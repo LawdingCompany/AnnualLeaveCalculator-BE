@@ -21,5 +21,6 @@ public class DailyUser {
 
     private int web;
     private int ios;
+    private int android;
 
 }
