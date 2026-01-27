@@ -5,17 +5,19 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record DailyUserDto (
+public record DailyUserDto(
     LocalDate recordDate,
     int web,
-    int ios
-)
-{
-    public static DailyUserDto from(DailyUser entity){
+    int ios,
+    int android
+) {
+
+    public static DailyUserDto from(DailyUser entity) {
         return DailyUserDto.builder()
             .recordDate(entity.getRecordDate())
             .web(entity.getWeb())
             .ios(entity.getIos())
+            .android(entity.getAndroid())
             .build();
     }
 }
