@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # 최신 버전 v4 권장
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -24,32 +24,27 @@ jobs:
           aws-region: ap-northeast-2
 
       - name: Login to DockerHub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3 # 최신 버전 v3 권장
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set image tags
+      - name: Set image tag
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          DATE_TAG=$(date +'%Y%m%d')
-          echo "IMAGE_TAG_LATEST=${{ secrets.DOCKER_USERNAME }}/lawding:latest" >> $GITHUB_ENV
-          echo "IMAGE_TAG_SHA=${{ secrets.DOCKER_USERNAME }}/lawding:${SHORT_SHA}" >> $GITHUB_ENV
-          echo "IMAGE_TAG_DATE=${{ secrets.DOCKER_USERNAME }}/lawding:${DATE_TAG}-${SHORT_SHA}" >> $GITHUB_ENV
           echo "DEPLOY_IMAGE=${{ secrets.DOCKER_USERNAME }}/lawding:${SHORT_SHA}" >> $GITHUB_ENV
 
+      # 💡 팁 적용: 도커허브에 고유 버전(SHA)과 최신 식별용(latest) 태그를 동시에 푸시
       - name: Build and Push Docker Image
         run: |
           docker build --no-cache \
-            -t ${{ env.IMAGE_TAG_LATEST }} \
-            -t ${{ env.IMAGE_TAG_SHA }} \
-            -t ${{ env.IMAGE_TAG_DATE }} \
+            -t ${{ env.DEPLOY_IMAGE }} \
+            -t ${{ secrets.DOCKER_USERNAME }}/lawding:latest \
             ./backend/leavecalc
+          docker push ${{ env.DEPLOY_IMAGE }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/lawding:latest
 
-          docker push ${{ env.IMAGE_TAG_LATEST }}
-          docker push ${{ env.IMAGE_TAG_SHA }}
-          docker push ${{ env.IMAGE_TAG_DATE }}
-
+      # EC2에는 현재 배포되는 버전(SHA) 이미지 1개만 유지하고 나머지는 정리
       - name: Deploy on EC2 via SSM
         run: |
           INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
