@@ -1,11 +1,9 @@
 package com.lawding.leavecalc.domain.global.config;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -42,12 +40,14 @@ public class DataSourceConfig {
      * getPassword() 메서드를 오버라이드하여 매번 새로운 IAM 토큰 반환
      */
     static class IamTokenHikariDataSource extends HikariDataSource {
+
         private final RdsUtilities rdsUtilities;
         private final String host;
         private final int port;
         private final String username;
 
-        public IamTokenHikariDataSource(String host, int port, String dbName, String username, String region) {
+        public IamTokenHikariDataSource(String host, int port, String dbName, String username,
+            String region) {
             super();
 
             this.host = host;
@@ -59,10 +59,10 @@ public class DataSourceConfig {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
 
-            this.setJdbcUrl(String.format("jdbc:mysql://%s:%d/%s?useSSL=true&requireSSL=true&verifyServerCertificate=false&serverTimezone=Asia/Seoul",
+            this.setJdbcUrl(String.format("jdbc:postgresql://%s:%d/%s?sslmode=require",
                 host, port, dbName));
             this.setUsername(username);
-            this.setDriverClassName("com.mysql.cj.jdbc.Driver");
+            this.setDriverClassName("org.postgresql.Driver");
 
             this.setMaximumPoolSize(5);
             this.setMinimumIdle(1);
@@ -70,8 +70,8 @@ public class DataSourceConfig {
             this.setIdleTimeout(600_000);     // 10분(idle이 오래되면 닫기)
             this.setConnectionTimeout(30_000); // 풀에서 커넥션 못 얻으면 30초 후 타임아웃
             this.setValidationTimeout(5_000); //  커넥션 검증(SELECT 1) 최대 대기 5초
-            this.setConnectionTestQuery("SELECT 1");
         }
+
         @Override
         public String getPassword() {
             //  매번 호출될 때마다 새로운 IAM 토큰 생성
