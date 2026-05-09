@@ -1,6 +1,6 @@
 package com.lawding.leavecalc.domain.stats.dto;
 
-import com.lawding.leavecalc.domain.stats.entity.DailyUser;
+import com.lawding.leavecalc.domain.stats.model.DailyUser;
 import java.time.LocalDate;
 import lombok.Builder;
 
