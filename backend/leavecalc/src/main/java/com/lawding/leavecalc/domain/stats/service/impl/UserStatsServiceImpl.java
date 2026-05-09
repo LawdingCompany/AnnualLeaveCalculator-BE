@@ -17,7 +17,7 @@ public class UserStatsServiceImpl implements UserStatsService {
 
     @Override
     public List<DailyUserDto> getAllDailyUser() {
-        return dailyUserRepository.findAll().stream()
+        return dailyUserRepository.scanAll().stream()
             .map(DailyUserDto::from)
             .toList();
     }
