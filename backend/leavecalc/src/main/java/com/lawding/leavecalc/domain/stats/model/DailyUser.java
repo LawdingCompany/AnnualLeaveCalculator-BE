@@ -1,6 +1,5 @@
 package com.lawding.leavecalc.domain.stats.model;
 
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,13 +15,13 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 @DynamoDbBean
 public class DailyUser {
 
-    private LocalDate recordDate;
+    private String recordDate;
     private int web;
     private int ios;
     private int android;
 
     @DynamoDbPartitionKey
-    public LocalDate getRecordDate(){
+    public String getRecordDate(){
         return recordDate;
     }
 }

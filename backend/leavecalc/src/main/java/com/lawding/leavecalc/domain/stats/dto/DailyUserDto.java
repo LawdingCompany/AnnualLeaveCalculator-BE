@@ -12,12 +12,12 @@ public record DailyUserDto(
     int android
 ) {
 
-    public static DailyUserDto from(DailyUser entity) {
+    public static DailyUserDto from(DailyUser dailyUser) {
         return DailyUserDto.builder()
-            .recordDate(entity.getRecordDate())
-            .web(entity.getWeb())
-            .ios(entity.getIos())
-            .android(entity.getAndroid())
+            .recordDate(LocalDate.parse(dailyUser.getRecordDate()))
+            .web(dailyUser.getWeb())
+            .ios(dailyUser.getIos())
+            .android(dailyUser.getAndroid())
             .build();
     }
 }
