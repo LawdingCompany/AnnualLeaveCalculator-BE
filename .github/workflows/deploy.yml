@@ -38,6 +38,7 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build --no-cache \
+             --platform linux/arm64 \
             -t ${{ env.DEPLOY_IMAGE }} \
             -t ${{ secrets.DOCKER_USERNAME }}/lawding:latest \
             ./backend/leavecalc # 소스 경로 유지
