@@ -1,10 +1,7 @@
 package com.lawding.leavecalc.domain.stats.repository;
 
-import com.lawding.leavecalc.domain.appversion.model.AppVersion;
 import com.lawding.leavecalc.domain.stats.model.DailyUser;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;

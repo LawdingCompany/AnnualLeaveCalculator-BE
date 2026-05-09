@@ -24,7 +24,7 @@ internal:
 app:
   db:
     host: ${RDS_HOST}
-    port : 3306
+    port : 5432
     name: ${DB_NAME}
     username: ${DB_USERNAME}
     region: ${AWS_REGION}

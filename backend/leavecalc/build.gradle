@@ -41,8 +41,8 @@ dependencies {
 	implementation "software.amazon.awssdk:dynamodb"
 	implementation "software.amazon.awssdk:dynamodb-enhanced"
 
-	// DB Driver : h2, MySQL JDBC Driver
-	runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
+	// DB Driver : h2, PostgreSQL JDBC Driver
+	runtimeOnly 'org.postgresql:postgresql'
 	runtimeOnly 'com.h2database:h2'
 
 	// --- Lombok ---
