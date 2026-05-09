@@ -44,6 +44,8 @@ jobs:
         run: |
           docker buildx build --no-cache \
             --platform linux/arm64 \
+            --cache-from type=registry,ref=${{ secrets.DOCKER_USERNAME }}/lawding:cache \
+            --cache-to type=registry,ref=${{ secrets.DOCKER_USERNAME }}/lawding:cache,mode=max \
             -t ${{ env.DEPLOY_IMAGE }} \
             -t ${{ secrets.DOCKER_USERNAME }}/lawding:latest \
             ./backend/leavecalc \
