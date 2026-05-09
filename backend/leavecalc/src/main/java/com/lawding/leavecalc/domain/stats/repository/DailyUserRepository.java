@@ -13,7 +13,7 @@ public class DailyUserRepository {
 
     private final DynamoDbTable<DailyUser> table;
 
-    private static final String TABLE_NAME = "app_version_policy";
+    private static final String TABLE_NAME = "daily_user";
 
     @Autowired
     public DailyUserRepository(DynamoDbEnhancedClient enhancedClient) {
