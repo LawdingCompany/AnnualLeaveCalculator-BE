@@ -30,7 +30,7 @@ public class Feedback {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 10, columnDefinition = "platform_type")
     private Platform platform;
 
     @Enumerated(EnumType.STRING)
