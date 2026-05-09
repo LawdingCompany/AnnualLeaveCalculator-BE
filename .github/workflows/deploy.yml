@@ -58,6 +58,7 @@ jobs:
             --parameters '{
               "commands": [
                 "set -e",
+                "docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}",
                 "docker pull '"$IMAGE"'",
                 "docker stop lawdingbe || true",
                 "docker rm lawdingbe || true",
