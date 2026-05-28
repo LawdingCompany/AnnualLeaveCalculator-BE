@@ -1,0 +1,8 @@
+package com.lawding.leavecalc.domain.holiday.service.impl;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class HolidayServiceImpl {
+
+}
