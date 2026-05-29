@@ -13,11 +13,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserStatsServiceImpl implements UserStatsService {
 
-    private final DailyUserRepository dailyUserRepository;
+    private final DailyUserRepository repository;
 
     @Override
     public List<DailyUserDto> getAllDailyUser() {
-        return dailyUserRepository.scanAll().stream()
+        return repository.scanAll().stream()
             .map(DailyUserDto::from)
             .toList();
     }
