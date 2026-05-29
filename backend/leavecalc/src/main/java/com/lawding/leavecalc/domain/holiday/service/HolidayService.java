@@ -5,5 +5,7 @@ import java.util.List;
 
 public interface HolidayService {
 
-    List<HolidayDto> getHolidays(int year);
+    List<HolidayDto> getHolidaysByYear(int year);
+
+    List<HolidayDto> getHolidaysByYearRange(int startYear, int endYear);
 }

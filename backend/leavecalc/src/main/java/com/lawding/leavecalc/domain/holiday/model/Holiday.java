@@ -1,6 +1,5 @@
 package com.lawding.leavecalc.domain.holiday.model;
 
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
