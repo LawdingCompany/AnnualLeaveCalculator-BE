@@ -21,7 +21,7 @@ public class Holiday {
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("holiday_date")
-    public String getRecordDate() {
+    public String getHolidayDate() {
         return holidayDate;
     }
 
