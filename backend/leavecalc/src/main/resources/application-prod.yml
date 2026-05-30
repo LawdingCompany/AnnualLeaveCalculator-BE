@@ -36,3 +36,7 @@ apple:
   key-id: ${APPLE_KEY_ID}
   private-key: ${APPLE_PRIVATE_KEY}
   redirect-uri: ${APPLE_REDIRECT_URI}
+
+jwt:
+  secret: "TGF3RGluZzRLaW1fMjUwNDA3X1llb25DaGFQcm9qZWN0"
+  access-expiration: 3600000

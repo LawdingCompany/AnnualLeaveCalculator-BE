@@ -1,6 +1,8 @@
 package com.lawding.global.config;
 
 import com.lawding.user.client.CustomOAuth2AccessTokenClient;
+import com.lawding.user.filter.JwtAuthenticationFilter;
+import com.lawding.user.handler.OAuth2SuccessHandler;
 import com.lawding.user.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -8,19 +10,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final CustomOAuth2AccessTokenClient customOAuth2AccessTokenClient;
     private final CustomOAuth2UserService customOAuth2UserService;
-
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             // 🔥 URL별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
@@ -39,7 +46,10 @@ public class SecurityConfig {
                     customOAuth2AccessTokenClient))
                 // 성공적으로 정보를 받아왔을 때, 우리 DB에 저장하는 서비스 주입
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-            );
+                .successHandler(oAuth2SuccessHandler)
+            )
+            // ✨ 캘린더 접근 시 시큐리티 기본 필터보다 우리가 만든 JWT 문지기를 먼저 거치게 설정!
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

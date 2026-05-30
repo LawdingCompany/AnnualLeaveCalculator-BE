@@ -1,11 +1,13 @@
 package com.lawding.user.service;
 
+import com.lawding.user.dto.CustomOAuth2User;
 import com.lawding.user.entity.User;
 import com.lawding.user.repository.UserRepository;
 import com.lawding.user.userinfo.AppleOAuth2UserInfo;
 import com.lawding.user.userinfo.GoogleOAuth2UserInfo;
 import com.lawding.user.userinfo.KakaoOAuth2UserInfo;
 import com.lawding.user.userinfo.OAuth2UserInfo;
+import com.lawding.user.userinfo.OAuth2UserInfoFactory;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,33 +35,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         // OAuth2 Provider(Google, Kakao, Apple)로부터 사용자 정보 조회
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
-        // 어떤 소셜 로그인인지 구분 (google / kakao / apple)
         String provider = userRequest.getClientRegistration().getRegistrationId();
-        OAuth2UserInfo userInfo = getOAuth2UserInfo(oAuth2User, provider);
 
-        // 2. 인터페이스를 통해 일관된 방식으로 데이터 추출 및 DB 저장
+        // 1. 공장(Factory)을 통해 플랫폼별로 데이터를 깔끔하게 추출!
+        OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider,
+            oAuth2User.getAttributes());
+
+        // 2. DB에 저장 또는 업데이트
         User user = saveOrUpdate(userInfo.getEmail(), userInfo.getName(), userInfo.getProvider());
 
-        return oAuth2User; // 시큐리티 세션에 정보 저장
+        // ✨ 3. 단순 껍데기가 아니라, 우리 User 객체를 품은 캡슐로 포장해서 리턴!
+        return new CustomOAuth2User(oAuth2User, user);
     }
-
-    private OAuth2UserInfo getOAuth2UserInfo(OAuth2User oAuth2User, String provider) {
-        Map<String, Object> attributes = oAuth2User.getAttributes();
-
-        OAuth2UserInfo userInfo = null;
-        if ("google".equals(provider)) {
-            userInfo = new GoogleOAuth2UserInfo(attributes);
-        } else if ("kakao".equals(provider)) {
-            userInfo = new KakaoOAuth2UserInfo(attributes);
-        } else if ("apple".equals(provider)) {
-            userInfo = new AppleOAuth2UserInfo(attributes);
-        } else {
-            throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다.");
-        }
-        return userInfo;
-    }
-
     private User saveOrUpdate(String email, String name, String provider) {
         User user = userRepository.findByEmail(email)
             .map(entity -> entity.updateName(name)) // 이미 있으면 이름만 업데이트

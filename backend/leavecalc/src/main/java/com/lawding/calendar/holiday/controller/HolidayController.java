@@ -50,4 +50,13 @@ public class HolidayController {
             )
         );
     }
+
+//    @GetMapping("/api/calendar/my-events")
+//    public ResponseEntity<?> getMyEvents(@AuthenticationPrincipal Long userId) {
+//        // 필터에서 저장했던 userId가 @AuthenticationPrincipal을 통해 자동으로 주입돼!
+//        System.out.println("현재 로그인한 유저 ID: " + userId);
+//
+//        // DB에서 이 userId로 일정을 조회하면 끝!
+//        return ResponseEntity.ok("...");
+//    }
 }
