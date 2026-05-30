@@ -90,3 +90,4 @@ app:
   jwt:
     secret: ${JWT_SECRET} # "TGF3RGluZzRLaW1fMjUwNDA3X1llb25DaGFQcm9qZWN0"
     access-expiration: 3600000 # 1시간
+    refresh-expiration: 1209600000   # RT: 14일 (1000 * 60 * 60 * 24 * 14)

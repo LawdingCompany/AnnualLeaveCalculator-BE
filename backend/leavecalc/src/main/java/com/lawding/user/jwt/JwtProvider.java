@@ -15,17 +15,20 @@ public class JwtProvider {
 
     private final SecretKey secretKey;
     private final long accessTokenExpirationMs;
+    private final long refreshTokenExpirationMs;
 
-    // yml 파일에 적어둔 설정값을 불러와서 초기화합니다.
     public JwtProvider(
         @Value("${app.jwt.secret}")
         String secret,
         @Value("${app.jwt.access-expiration}")
-        long accessTokenExpirationMs) {
+        long accessTokenExpirationMs,
+        @Value("${app.jwt.refresh-expiration}")
+        long refreshTokenExpirationMs) {
         // Base64로 인코딩된 키를 디코딩해서 안전한 SecretKey 객체로 만듭니다.
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenExpirationMs = accessTokenExpirationMs;
+        this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
 
     // 1. JWT Access Token 생성기
@@ -43,8 +46,21 @@ public class JwtProvider {
             .compact();
     }
 
-    // 2. JWT 토큰 유효성 검증기
-    // 캘린더 접근 시 제출한 토큰이 진짜인지, 만료되진 않았는지 확인합니다.
+    // 2. JWT Refresh Token 생성기 (새로 추가!)
+    // RT는 보통 추가 데이터(Claim) 없이 유저 ID 정도만 최소한으로 넣어둡니다.
+    public String createRefreshToken(Long userId) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + refreshTokenExpirationMs);
+
+        return Jwts.builder()
+            .subject(String.valueOf(userId))
+            .issuedAt(now)
+            .expiration(expiryDate)
+            .signWith(secretKey, Jwts.SIG.HS256)
+            .compact();
+    }
+
+    // 3. JWT 토큰 유효성 검증기 (기존과 동일 - AT, RT 둘 다 이 메서드로 검증 가능!)
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -59,7 +75,7 @@ public class JwtProvider {
         }
     }
 
-    // 3. 토큰에서 유저 ID 꺼내기
+    // 4. 토큰에서 유저 ID 꺼내기
     // 검증이 끝난 토큰을 분해해서 안에 들어있는 userId를 꺼냅니다.
     public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
