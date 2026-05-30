@@ -2,6 +2,7 @@ package com.lawding.global.config;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,28 +17,29 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    @Value("${app.db.host}")
-    private String host;
+    @Value("${spring.datasource.url}")
+    private String url;
 
-    @Value("${app.db.port}")
-    private int port;
-
-    @Value("${app.db.name}")
-    private String dbName;
-
-    @Value("${app.db.username}")
+    @Value("${spring.datasource.username}")
     private String username;
 
-    @Value("${app.db.region}")
+    @Value("${app.aws.host}")
+    private String host;
+
+    @Value("${app.aws.port}")
+    private int port;
+
+    @Value("${app.aws.region}")
     private String region;
 
     @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
     public DataSource dataSource() {
-        return new IamTokenHikariDataSource(host, port, dbName, username, region);
+        return new IamTokenHikariDataSource(host, port, region, username, url);
     }
 
     /**
-     * getPassword() 메서드를 오버라이드하여 매번 새로운 IAM 토큰 반환
+     * IAM 토큰을 매번 발급받는 커스텀 DataSource
      */
     static class IamTokenHikariDataSource extends HikariDataSource {
 
@@ -46,8 +48,8 @@ public class DataSourceConfig {
         private final int port;
         private final String username;
 
-        public IamTokenHikariDataSource(String host, int port, String dbName, String username,
-            String region) {
+        public IamTokenHikariDataSource(String host, int port, String region, String username,
+            String url) {
             super();
 
             this.host = host;
@@ -59,17 +61,8 @@ public class DataSourceConfig {
                 .credentialsProvider(DefaultCredentialsProvider.create())
                 .build();
 
-            this.setJdbcUrl(String.format("jdbc:postgresql://%s:%d/%s?sslmode=require",
-                host, port, dbName));
+            this.setJdbcUrl(url);
             this.setUsername(username);
-            this.setDriverClassName("org.postgresql.Driver");
-
-            this.setMaximumPoolSize(5);
-            this.setMinimumIdle(1);
-            this.setMaxLifetime(840_000);     // 14분(토큰 15분 만료 전에 교체)
-            this.setIdleTimeout(600_000);     // 10분(idle이 오래되면 닫기)
-            this.setConnectionTimeout(30_000); // 풀에서 커넥션 못 얻으면 30초 후 타임아웃
-            this.setValidationTimeout(5_000); //  커넥션 검증(SELECT 1) 최대 대기 5초
         }
 
         @Override

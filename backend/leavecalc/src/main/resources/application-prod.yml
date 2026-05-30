@@ -1,6 +1,22 @@
 spring:
   application:
-    name:
+    name: lawding
+
+  jackson:
+    time-zone: Asia/Seoul
+
+  datasource:
+    url: jdbc:postgresql://${RDS_HOST}:5432/${DB_NAME}
+    username: ${DB_USERNAME}
+    driver-class-name: org.postgresql.Driver
+
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      max-lifetime: 840000      # 14분 (IAM 토큰 15분 만료 전 자동 교체)
+      idle-timeout: 600000      # 10분
+      connection-timeout: 30000  # 30초
+      validation-timeout: 5000  # 5초
 
   jpa:
     hibernate:
@@ -11,32 +27,66 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-  jackson:
-    time-zone: Asia/Seoul
+  security:
+    oauth2:
+      client:
+        registration:
+          apple:
+            client-id: ${APPLE_CLIENT_ID}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "${BASE_URL}/login/oauth2/code/apple" # https://api.lawding.net
+            client-name: Apple
+            scope:
+              - name
+              - email
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            redirect-uri: "${BASE_URL}/login/oauth2/code/kakao"
+            client-name: Kakao
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          apple:
+            authorization-uri: https://appleid.apple.com/auth/authorize?response_mode=form_post
+            token-uri: https://appleid.apple.com/auth/token
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
 
 logging:
   level:
     root: INFO
-    com.lawding.leavecalc: INFO
+    com.lawding: INFO
 
-internal:
-  secret: ${INTERNAL_AUTH_SECRET}
-
+# 서비스 커스텀 속성
 app:
-  db:
+  internal:
+    secret: ${INTERNAL_AUTH_SECRET}
+
+  aws:
     host: ${RDS_HOST}
     port: 5432
-    name: ${DB_NAME}
-    username: ${DB_USERNAME}
     region: ${AWS_REGION}
 
-apple:
-  team-id: ${APPLE_TEAM_ID}
-  client-id: ${APPLE_CLIENT_ID}
-  key-id: ${APPLE_KEY_ID}
-  private-key: ${APPLE_PRIVATE_KEY}
-  redirect-uri: ${APPLE_REDIRECT_URI}
+  apple:
+    team-id: ${APPLE_TEAM_ID}
+    key-id: ${APPLE_KEY_ID}
+    private-key: ${APPLE_PRIVATE_KEY}
 
-jwt:
-  secret: "TGF3RGluZzRLaW1fMjUwNDA3X1llb25DaGFQcm9qZWN0"
-  access-expiration: 3600000
+  jwt:
+    secret: ${JWT_SECRET} # "TGF3RGluZzRLaW1fMjUwNDA3X1llb25DaGFQcm9qZWN0"
+    access-expiration: 3600000 # 1시간

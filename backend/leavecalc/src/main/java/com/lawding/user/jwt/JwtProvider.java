@@ -18,9 +18,9 @@ public class JwtProvider {
 
     // yml 파일에 적어둔 설정값을 불러와서 초기화합니다.
     public JwtProvider(
-        @Value("${jwt.secret}")
+        @Value("${app.jwt.secret}")
         String secret,
-        @Value("${jwt.access-expiration}")
+        @Value("${app.jwt.access-expiration}")
         long accessTokenExpirationMs) {
         // Base64로 인코딩된 키를 디코딩해서 안전한 SecretKey 객체로 만듭니다.
         byte[] keyBytes = Decoders.BASE64.decode(secret);

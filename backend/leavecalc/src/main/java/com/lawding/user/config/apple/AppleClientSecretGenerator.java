@@ -19,14 +19,14 @@ public class AppleClientSecretGenerator {
     @Value("${spring.security.oauth2.client.registration.apple.client-id}")
     private String appleClientId;
 
-    @Value("${apple.team-id}")
+    @Value("${app.apple.team-id}")
     private String appleTeamId;
 
-    @Value("${apple.key-id}")
+    @Value("${app.apple.key-id}")
     private String appleKeyId;
 
-    @Value("${apple.private-key-path}")
-    private String applePrivateKeyPath;
+    @Value("${app.apple.private-key}")
+    private String applePrivateKey;
 
     public String createAppleClientSecret() {
         try {
@@ -47,8 +47,7 @@ public class AppleClientSecretGenerator {
     }
 
     private PrivateKey getPrivateKey() throws Exception {
-        byte[] keyBytes = Files.readAllBytes(Paths.get(applePrivateKeyPath));
-        String privateKeyPEM = new String(keyBytes)
+        String privateKeyPEM = applePrivateKey
             .replace("-----BEGIN PRIVATE KEY-----", "")
             .replace("-----END PRIVATE KEY-----", "")
             .replaceAll("\\s+", "");
