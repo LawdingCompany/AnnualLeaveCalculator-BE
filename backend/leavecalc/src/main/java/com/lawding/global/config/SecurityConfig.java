@@ -1,0 +1,46 @@
+package com.lawding.global.config;
+
+import com.lawding.user.client.CustomOAuth2AccessTokenClient;
+import com.lawding.user.service.CustomOAuth2UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+    private final CustomOAuth2AccessTokenClient customOAuth2AccessTokenClient;
+    private final CustomOAuth2UserService customOAuth2UserService;
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+
+            // 🔥 URL별 접근 권한 설정
+            .authorizeHttpRequests(auth -> auth
+                // 연차 계산기 관련 API와 기본 화면은 무조건 통과!
+                .requestMatchers("/", "/api/leavecalc/**", "/login**").permitAll()
+                // 캘린더 API는 반드시 소셜 로그인을 완료한 유저만 통과!
+                .requestMatchers("/api/calendar/**").authenticated()
+                // 그 외 모든 요청도 일단 보호
+                .anyRequest().authenticated()
+            )
+
+            // 🔥 소셜 로그인 기능 활성화 및 조립
+            .oauth2Login(oauth2 -> oauth2
+                // 애플 통신을 위해 우리가 만든 커스텀 클라이언트 주입
+                .tokenEndpoint(token -> token.accessTokenResponseClient(
+                    customOAuth2AccessTokenClient))
+                // 성공적으로 정보를 받아왔을 때, 우리 DB에 저장하는 서비스 주입
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+            );
+
+        return http.build();
+    }
+}
