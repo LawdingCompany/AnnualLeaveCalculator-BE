@@ -31,9 +31,16 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 3. 토큰 발급
         String accessToken = jwtProvider.createAccessToken(user.getId(), user.getEmail());
 
-        // 4. 플러터 앱을 깨우는 커스텀 스킴 주소로 변경! (lawding은 예시, 원하는 이름으로 설정 가능)
-        String targetUrl = UriComponentsBuilder.fromUriString("lawding://login/success")
-            .queryParam("token", accessToken)
+//        // 4. 플러터 앱을 깨우는 커스텀 스킴 주소로 변경! (lawding은 예시, 원하는 이름으로 설정 가능)
+//        String targetUrl = UriComponentsBuilder.fromUriString("lawding://login/success")
+//            .queryParam("token", accessToken)
+//            .queryParam("refreshToken", refreshToken)
+//            .build().toUriString();
+
+        // 🚧 [테스트용] 앱 주소 대신 로컬 웹 주소로 리다이렉트!
+        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:8080/test/login-success")
+            .queryParam("accessToken", accessToken)
+            // .queryParam("refreshToken", refreshToken) // 나중에 추가하면 여기도!
             .build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
