@@ -31,7 +31,7 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(
-                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
 
             // 🔥 URL별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
