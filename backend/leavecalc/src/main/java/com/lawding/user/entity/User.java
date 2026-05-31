@@ -1,15 +1,19 @@
 package com.lawding.user.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
@@ -27,15 +31,29 @@ public class User {
     private String email;
     private String provider;
 
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
+    private LocalDateTime lastLoginAt;
+
     @Builder
     public User(String name, String email, String provider) {
         this.name = name;
         this.email = email;
         this.provider = provider;
+        this.lastLoginAt = LocalDateTime.now();
     }
 
     public User updateName(String name) {
         this.name = name;
         return this;
+    }
+
+    public void updateLastLogin() {
+        this.lastLoginAt = LocalDateTime.now();
     }
 }

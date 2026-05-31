@@ -6,7 +6,7 @@ spring:
     time-zone: Asia/Seoul
 
   datasource:
-    url: jdbc:postgresql://${RDS_HOST}:5432/${DB_NAME}
+    url: jdbc:postgresql://${RDS_HOST}:${RDS_PORT}/${DB_NAME}
     username: ${DB_USERNAME}
     driver-class-name: org.postgresql.Driver
 
@@ -40,31 +40,31 @@ spring:
             scope:
               - name
               - email
-          google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope:
-              - email
-              - profile
-          kakao:
-            client-id: ${KAKAO_CLIENT_ID}
-            client-secret: ${KAKAO_CLIENT_SECRET}
-            client-authentication-method: client_secret_post
-            authorization-grant-type: authorization_code
-            redirect-uri: "${BASE_URL}/v1/login/oauth2/code/kakao"
-            client-name: Kakao
-            scope:
-              - profile_nickname
-              - account_email
+#          google:
+#            client-id: ${GOOGLE_CLIENT_ID}
+#            client-secret: ${GOOGLE_CLIENT_SECRET}
+#            scope:
+#              - email
+#              - profile
+#          kakao:
+#            client-id: ${KAKAO_CLIENT_ID}
+#            client-secret: ${KAKAO_CLIENT_SECRET}
+#            client-authentication-method: client_secret_post
+#            authorization-grant-type: authorization_code
+#            redirect-uri: "${BASE_URL}/v1/login/oauth2/code/kakao"
+#            client-name: Kakao
+#            scope:
+#              - profile_nickname
+#              - account_email
         provider:
           apple:
             authorization-uri: https://appleid.apple.com/auth/authorize?response_mode=form_post
             token-uri: https://appleid.apple.com/auth/token
-          kakao:
-            authorization-uri: https://kauth.kakao.com/oauth/authorize
-            token-uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user-name-attribute: id
+#          kakao:
+#            authorization-uri: https://kauth.kakao.com/oauth/authorize
+#            token-uri: https://kauth.kakao.com/oauth/token
+#            user-info-uri: https://kapi.kakao.com/v2/user/me
+#            user-name-attribute: id
 
 
 logging:
@@ -79,7 +79,7 @@ app:
 
   aws:
     host: ${RDS_HOST}
-    port: 5432
+    port: ${RDS_PORT}
     region: ${AWS_REGION}
 
   apple:
@@ -88,6 +88,6 @@ app:
     private-key: ${APPLE_PRIVATE_KEY}
 
   jwt:
-    secret: ${JWT_SECRET} # "TGF3RGluZzRLaW1fMjUwNDA3X1llb25DaGFQcm9qZWN0"
+    secret: ${JWT_SECRET}
     access-expiration: 3600000 # 1시간
     refresh-expiration: 1209600000   # RT: 14일 (1000 * 60 * 60 * 24 * 14)

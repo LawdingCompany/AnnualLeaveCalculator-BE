@@ -47,10 +47,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // ✨ 3. 단순 껍데기가 아니라, 우리 User 객체를 품은 캡슐로 포장해서 리턴!
         return new CustomOAuth2User(oAuth2User, user);
     }
+
     private User saveOrUpdate(String email, String name, String provider) {
         User user = userRepository.findByEmail(email)
-            .map(entity -> entity.updateName(name)) // 이미 있으면 이름만 업데이트
-            .orElse(User.builder()                  // 없으면 새로 가입
+            .map(entity -> {
+                entity.updateName(name);
+                entity.updateLastLogin();
+                return entity;
+            })
+            .orElseGet(() -> User.builder()
                 .email(email)
                 .name(name)
                 .provider(provider)
