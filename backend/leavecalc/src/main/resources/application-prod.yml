@@ -66,6 +66,8 @@ spring:
 #            user-info-uri: https://kapi.kakao.com/v2/user/me
 #            user-name-attribute: id
 
+server:
+  forward-headers-strategy: framework # API Gateway가 넘겨주는 도메인(https) 정보를 스프링이 인식하게 만듦
 
 logging:
   level:
