@@ -25,11 +25,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
-        log.info("11");
         // 1. 서비스에서 넘겨준 캡슐 객체로 캐스팅
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         Long userId = customOAuth2User.getUser().getId();
-        log.info("22");
         // 2. 캡슐 안에서 우리 서비스의 진짜 유저 객체만 쏙 빼기! (DB 조회 불필요✨)
         User user = customOAuth2User.getUser();
         // 3. 토큰 발급
@@ -43,7 +41,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         user.updateRefreshToken(refreshToken);
         userRepository.save(user);
-        log.info("여기까진 되는거같은데 provider={}, userId={}", user.getProvider(), user.getId());
         // 🚧 [테스트용] 앱 주소 대신 로컬 웹 주소로 리다이렉트!
         String targetUrl = UriComponentsBuilder.fromUriString("https://lawding.net/test/login-success")
             .queryParam("accessToken", accessToken)

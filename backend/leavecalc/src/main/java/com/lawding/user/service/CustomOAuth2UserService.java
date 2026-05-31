@@ -32,19 +32,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
      */
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-
-        log.info("1");
         // OAuth2 Provider(Google, Kakao, Apple)로부터 사용자 정보 조회
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String provider = userRequest.getClientRegistration().getRegistrationId();
-        log.info("2");
         // 1. 공장(Factory)을 통해 플랫폼별로 데이터를 깔끔하게 추출!
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider,
             oAuth2User.getAttributes());
-        log.info("3");
         // 2. DB에 저장 또는 업데이트
         User user = saveOrUpdate(userInfo.getEmail(), userInfo.getName(), userInfo.getProvider());
-        log.info("4");
         // ✨ 3. 단순 껍데기가 아니라, 우리 User 객체를 품은 캡슐로 포장해서 리턴!
         return new CustomOAuth2User(oAuth2User, user);
     }
