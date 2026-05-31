@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-24.04-arm # ✅ 네이티브 arm64 러너
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout code
@@ -47,24 +47,54 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+          RDS_HOST: ${{ secrets.RDS_HOST }}
+          RDS_PORT: ${{ secrets.RDS_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          AWS_REGION_VAL: ${{ secrets.AWS_REGION }}
+          INTERNAL_AUTH_SECRET: ${{ secrets.INTERNAL_AUTH_SECRET }}
+          BASE_URL: ${{ secrets.BASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          APPLE_CLIENT_ID: ${{ secrets.APPLE_CLIENT_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_PRIVATE_KEY: ${{ secrets.APPLE_PRIVATE_KEY }}
         run: |
           INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
           IMAGE=${{ env.DEPLOY_IMAGE }}
 
-          aws ssm send-command \
+          COMMAND_ID=$(aws ssm send-command \
             --cli-binary-format raw-in-base64-out \
             --targets "Key=instanceIds,Values=$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy LawDingBE-prod" \
-            --parameters '{
-              "commands": [
-                "set -e",
-                "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}",
-                "docker pull '"$IMAGE"'",
-                "docker stop lawdingbe || true",
-                "docker rm lawdingbe || true",
-                "docker run -d --name lawdingbe -p 8080:8080 --restart=always --log-driver=awslogs --log-opt awslogs-region=ap-northeast-2 --log-opt awslogs-group=/ec2/lawdingbe --log-opt awslogs-create-group=true --log-opt awslogs-stream='"$INSTANCE_ID"'-lawdingbe -e TZ=Asia/Seoul -e JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul -e SPRING_JACKSON_TIME_ZONE=Asia/Seoul -e SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=Asia/Seoul -e SPRING_PROFILES_ACTIVE=prod -e RDS_HOST=${{ secrets.RDS_HOST }} -e RDS_PORT=${{ secrets.RDS_PORT }} -e DB_NAME=${{ secrets.DB_NAME }} -e DB_USERNAME=${{ secrets.DB_USERNAME }} -e AWS_REGION=${{ secrets.AWS_REGION }} -e INTERNAL_AUTH_SECRET=${{ secrets.INTERNAL_AUTH_SECRET }} -e BASE_URL=${{ secrets.BASE_URL }} -e JWT_SECRET=${{ secrets.JWT_SECRET }} -e APPLE_CLIENT_ID=${{ secrets.APPLE_CLIENT_ID }} -e APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }} -e APPLE_KEY_ID=${{ secrets.APPLE_KEY_ID }} -e APPLE_PRIVATE_KEY=${{ secrets.APPLE_PRIVATE_KEY }} '"$IMAGE"'",
-                "docker image ls ${{ secrets.DOCKER_USERNAME }}/lawding -q | tail -n +2 | xargs -r docker rmi -f || true",
-                "docker image prune -f || true"
+            --parameters "{
+              \"commands\": [
+                \"set -e\",
+                \"echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin\",
+                \"docker pull ${IMAGE}\",
+                \"docker stop lawdingbe || true\",
+                \"docker rm lawdingbe || true\",
+                \"docker run -d --name lawdingbe -p 8080:8080 --restart=always --log-driver=awslogs --log-opt awslogs-region=ap-northeast-2 --log-opt awslogs-group=/ec2/lawdingbe --log-opt awslogs-create-group=true --log-opt awslogs-stream=${INSTANCE_ID}-lawdingbe -e TZ=Asia/Seoul -e JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul -e SPRING_JACKSON_TIME_ZONE=Asia/Seoul -e SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=Asia/Seoul -e SPRING_PROFILES_ACTIVE=prod -e RDS_HOST=${RDS_HOST} -e RDS_PORT=${RDS_PORT} -e DB_NAME=${DB_NAME} -e DB_USERNAME=${DB_USERNAME} -e DB_PASSWORD=${DB_PASSWORD} -e AWS_REGION=${AWS_REGION_VAL} -e INTERNAL_AUTH_SECRET=${INTERNAL_AUTH_SECRET} -e BASE_URL=${BASE_URL} -e JWT_SECRET=${JWT_SECRET} -e APPLE_CLIENT_ID=${APPLE_CLIENT_ID} -e APPLE_TEAM_ID=${APPLE_TEAM_ID} -e APPLE_KEY_ID=${APPLE_KEY_ID} -e APPLE_PRIVATE_KEY=${APPLE_PRIVATE_KEY} ${IMAGE}\",
+                \"docker image ls ${DOCKER_USER}/lawding -q | tail -n +2 | xargs -r docker rmi -f || true\",
+                \"docker image prune -f || true\"
               ]
-            }'
+            }" \
+            --query "Command.CommandId" \
+            --output text)
+
+          echo "CommandId: $COMMAND_ID"
+
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID"
+
+          STATUS=$(aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "$INSTANCE_ID" \
+            --query "Status" \
+            --output text)
+
+          echo "Deploy status: $STATUS"
+          [ "$STATUS" = "Success" ] || exit 1
