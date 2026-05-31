@@ -26,7 +26,8 @@ public class InternalAuthFilter extends HttpFilter {
 
         // 예외 처리: 소셜 로그인 관련 주소는 헤더 검사 없이 무조건 통과
         if (requestURI.startsWith("/oauth2/") ||
-            requestURI.startsWith("/login/oauth2/code/")) {
+            requestURI.startsWith("/login/oauth2/code/") ||
+            requestURI.equals("/test/login-success")) { // 테스트용 url
 
             chain.doFilter(request, response);
             return;
