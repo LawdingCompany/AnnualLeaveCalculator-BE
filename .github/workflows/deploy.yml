@@ -44,9 +44,9 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/lawding:latest
 
       - name: Deploy on EC2 via SSM
-         env:
-           DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-           DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
+        env:
+          DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
           IMAGE=${{ env.DEPLOY_IMAGE }}
