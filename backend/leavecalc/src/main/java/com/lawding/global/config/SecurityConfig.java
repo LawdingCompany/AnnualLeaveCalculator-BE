@@ -5,6 +5,7 @@ import com.lawding.user.filter.JwtAuthenticationFilter;
 import com.lawding.user.handler.OAuth2SuccessHandler;
 import com.lawding.user.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -50,6 +52,10 @@ public class SecurityConfig {
                 // 성공적으로 정보를 받아왔을 때, 우리 DB에 저장하는 서비스 주입
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 .successHandler(oAuth2SuccessHandler)
+                .failureHandler((request, response, exception) -> {
+                    log.error("OAuth2 로그인 실패: {}", exception.getMessage(), exception);
+                    response.sendRedirect("/login?error");
+                })
             )
             // ✨ 캘린더 접근 시 시큐리티 기본 필터보다 우리가 만든 JWT 문지기를 먼저 거치게 설정!
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
