@@ -44,6 +44,9 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/lawding:latest
 
       - name: Deploy on EC2 via SSM
+         env:
+           DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+           DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
         run: |
           INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
           IMAGE=${{ env.DEPLOY_IMAGE }}
@@ -56,7 +59,7 @@ jobs:
             --parameters '{
               "commands": [
                 "set -e",
-                "docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}",
+                "docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}",
                 "docker pull '"$IMAGE"'",
                 "docker stop lawdingbe || true",
                 "docker rm lawdingbe || true",
