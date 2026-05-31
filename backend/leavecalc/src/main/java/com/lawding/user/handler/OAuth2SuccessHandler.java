@@ -43,6 +43,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         user.updateRefreshToken(refreshToken);
         userRepository.save(user);
 
+        log.info("여기까진 되는거같은데");
         // 🚧 [테스트용] 앱 주소 대신 로컬 웹 주소로 리다이렉트!
         String targetUrl = UriComponentsBuilder.fromUriString("https://lawding.net/test/login-success")
             .queryParam("accessToken", accessToken)
