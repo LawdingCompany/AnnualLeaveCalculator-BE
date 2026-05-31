@@ -63,23 +63,56 @@ jobs:
           INSTANCE_ID=${{ secrets.EC2_INSTANCE_ID }}
           IMAGE=${{ env.DEPLOY_IMAGE }}
 
+          DOCKER_RUN_CMD="docker run -d --name lawdingbe -p 8080:8080 --restart=always \
+            --log-driver=awslogs \
+            --log-opt awslogs-region=ap-northeast-2 \
+            --log-opt awslogs-group=/ec2/lawdingbe \
+            --log-opt awslogs-create-group=true \
+            --log-opt awslogs-stream=${INSTANCE_ID}-lawdingbe \
+            -e TZ=Asia/Seoul \
+            -e JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul \
+            -e SPRING_JACKSON_TIME_ZONE=Asia/Seoul \
+            -e SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=Asia/Seoul \
+            -e SPRING_PROFILES_ACTIVE=prod \
+            -e RDS_HOST=${RDS_HOST} \
+            -e RDS_PORT=${RDS_PORT} \
+            -e DB_NAME=${DB_NAME} \
+            -e DB_USERNAME=${DB_USERNAME} \
+            -e DB_PASSWORD=${DB_PASSWORD} \
+            -e AWS_REGION=${AWS_REGION_VAL} \
+            -e INTERNAL_AUTH_SECRET=${INTERNAL_AUTH_SECRET} \
+            -e BASE_URL=${BASE_URL} \
+            -e JWT_SECRET=${JWT_SECRET} \
+            -e APPLE_CLIENT_ID=${APPLE_CLIENT_ID} \
+            -e APPLE_TEAM_ID=${APPLE_TEAM_ID} \
+            -e APPLE_KEY_ID=${APPLE_KEY_ID} \
+            -e APPLE_PRIVATE_KEY=${APPLE_PRIVATE_KEY} \
+            ${IMAGE}"
+
+          COMMANDS=$(jq -n \
+            --arg image "$IMAGE" \
+            --arg docker_user "$DOCKER_USER" \
+            --arg docker_pass "$DOCKER_PASS" \
+            --arg run_cmd "$DOCKER_RUN_CMD" \
+            '{
+              commands: [
+                "set -e",
+                ("echo " + $docker_pass + " | docker login -u " + $docker_user + " --password-stdin"),
+                ("docker pull " + $image),
+                "docker stop lawdingbe || true",
+                "docker rm lawdingbe || true",
+                $run_cmd,
+                ("docker image ls " + $docker_user + "/lawding -q | tail -n +2 | xargs -r docker rmi -f || true"),
+                "docker image prune -f || true"
+              ]
+            }')
+
           COMMAND_ID=$(aws ssm send-command \
             --cli-binary-format raw-in-base64-out \
             --targets "Key=instanceIds,Values=$INSTANCE_ID" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy LawDingBE-prod" \
-            --parameters "{
-              \"commands\": [
-                \"set -e\",
-                \"echo ${DOCKER_PASS} | docker login -u ${DOCKER_USER} --password-stdin\",
-                \"docker pull ${IMAGE}\",
-                \"docker stop lawdingbe || true\",
-                \"docker rm lawdingbe || true\",
-                \"docker run -d --name lawdingbe -p 8080:8080 --restart=always --log-driver=awslogs --log-opt awslogs-region=ap-northeast-2 --log-opt awslogs-group=/ec2/lawdingbe --log-opt awslogs-create-group=true --log-opt awslogs-stream=${INSTANCE_ID}-lawdingbe -e TZ=Asia/Seoul -e JAVA_TOOL_OPTIONS=-Duser.timezone=Asia/Seoul -e SPRING_JACKSON_TIME_ZONE=Asia/Seoul -e SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_TIME_ZONE=Asia/Seoul -e SPRING_PROFILES_ACTIVE=prod -e RDS_HOST=${RDS_HOST} -e RDS_PORT=${RDS_PORT} -e DB_NAME=${DB_NAME} -e DB_USERNAME=${DB_USERNAME} -e DB_PASSWORD=${DB_PASSWORD} -e AWS_REGION=${AWS_REGION_VAL} -e INTERNAL_AUTH_SECRET=${INTERNAL_AUTH_SECRET} -e BASE_URL=${BASE_URL} -e JWT_SECRET=${JWT_SECRET} -e APPLE_CLIENT_ID=${APPLE_CLIENT_ID} -e APPLE_TEAM_ID=${APPLE_TEAM_ID} -e APPLE_KEY_ID=${APPLE_KEY_ID} -e APPLE_PRIVATE_KEY=${APPLE_PRIVATE_KEY} ${IMAGE}\",
-                \"docker image ls ${DOCKER_USER}/lawding -q | tail -n +2 | xargs -r docker rmi -f || true\",
-                \"docker image prune -f || true\"
-              ]
-            }" \
+            --parameters "$COMMANDS" \
             --query "Command.CommandId" \
             --output text)
 
