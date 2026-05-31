@@ -40,6 +40,8 @@ public class User {
 
     private LocalDateTime lastLoginAt;
 
+    @Column(length = 512)
+    private String refreshToken;
     @Builder
     public User(String name, String email, String provider) {
         this.name = name;
@@ -55,5 +57,9 @@ public class User {
 
     public void updateLastLogin() {
         this.lastLoginAt = LocalDateTime.now();
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

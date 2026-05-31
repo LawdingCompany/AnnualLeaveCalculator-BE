@@ -21,6 +21,16 @@ public class InternalAuthFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response,
         FilterChain chain) throws IOException, ServletException {
+        // 1. 현재 들어온 요청의 주소(URI)를 확인합니다.
+        String requestURI = request.getRequestURI();
+
+        // 예외 처리: 소셜 로그인 관련 주소는 헤더 검사 없이 무조건 통과
+        if (requestURI.startsWith("/oauth2/") ||
+            requestURI.startsWith("/login/oauth2/code/")) {
+
+            chain.doFilter(request, response);
+            return;
+        }
         String header = request.getHeader("X-Internal-Auth");
 
         log.info("InternalAuthFilter 실행: X-Internal-Auth={}, remoteAddr={}",
