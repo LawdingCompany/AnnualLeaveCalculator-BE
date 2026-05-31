@@ -51,7 +51,6 @@ jobs:
           RDS_PORT: ${{ secrets.RDS_PORT }}
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           AWS_REGION_VAL: ${{ secrets.AWS_REGION }}
           INTERNAL_AUTH_SECRET: ${{ secrets.INTERNAL_AUTH_SECRET }}
           BASE_URL: ${{ secrets.BASE_URL }}
