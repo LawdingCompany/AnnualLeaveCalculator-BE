@@ -71,6 +71,7 @@ server:
 
 logging:
   level:
+    org.springframework.security: DEBUG
     root: INFO
     com.lawding: INFO
 
