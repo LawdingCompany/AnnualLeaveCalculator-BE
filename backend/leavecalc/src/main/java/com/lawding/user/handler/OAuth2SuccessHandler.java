@@ -25,10 +25,11 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
-
+        log.info("11");
         // 1. 서비스에서 넘겨준 캡슐 객체로 캐스팅
         CustomOAuth2User customOAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         Long userId = customOAuth2User.getUser().getId();
+        log.info("22");
         // 2. 캡슐 안에서 우리 서비스의 진짜 유저 객체만 쏙 빼기! (DB 조회 불필요✨)
         User user = customOAuth2User.getUser();
         // 3. 토큰 발급
