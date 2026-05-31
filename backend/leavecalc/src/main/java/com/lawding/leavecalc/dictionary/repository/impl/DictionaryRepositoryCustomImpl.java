@@ -1,7 +1,7 @@
 package com.lawding.leavecalc.dictionary.repository.impl;
 
-import static com.lawding.leavecalc.domain.dictionary.category.entity.QDictionaryCategory.dictionaryCategory;
-import static com.lawding.leavecalc.domain.dictionary.entity.QDictionary.dictionary;
+import static com.lawding.leavecalc.dictionary.category.entity.QDictionaryCategory.dictionaryCategory;
+import static com.lawding.leavecalc.dictionary.entity.QDictionary.dictionary;
 
 import com.lawding.leavecalc.dictionary.entity.Dictionary;
 import com.lawding.leavecalc.dictionary.repository.DictionaryRepositoryCustom;
