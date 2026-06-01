@@ -44,7 +44,6 @@ public class SecurityConfig {
                     .anyRequest().permitAll()
             )
 
-            // 🔥 소셜 로그인 기능 활성화 및 조립
             .oauth2Login(oauth2 -> oauth2
                 // 애플 통신을 위해 우리가 만든 커스텀 클라이언트 주입
                 .redirectionEndpoint(redirection ->
@@ -55,10 +54,7 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 .successHandler(oAuth2SuccessHandler)
                 .failureHandler((request, response, exception) -> {
-                    log.error("OAuth2 로그인 실패: {}", exception.getMessage(), exception);
-                    log.error("request method: {}", request.getMethod());
-                    log.error("state param: {}", request.getParameter("state"));
-                    log.error("code param: {}", request.getParameter("code"));
+                    log.error("[OAuth2 Login Fail] Error: {}", exception.getMessage());
                     response.sendRedirect("/login?error");
                 })
             )
