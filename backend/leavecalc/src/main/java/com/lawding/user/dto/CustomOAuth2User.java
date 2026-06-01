@@ -10,9 +10,13 @@ public class CustomOAuth2User extends DefaultOAuth2User {
 
     private final User user;
 
-    public CustomOAuth2User(OAuth2User oAuth2User, User user) {
-        // 부모 클래스(DefaultOAuth2User)에게 권한과 속성값들을 전달 ("email"은 기준이 되는 키)
-        super(oAuth2User.getAuthorities(), oAuth2User.getAttributes(), "email");
+    public CustomOAuth2User(OAuth2User oAuth2User, User user, String userNameAttributeName) {
+        // "email" 대신 받아온 식별자 키를 그대로 넘겨줍니다.
+        super(oAuth2User.getAuthorities(), oAuth2User.getAttributes(), userNameAttributeName);
         this.user = user;
+    }
+
+    public User getUser() {
+        return user;
     }
 }

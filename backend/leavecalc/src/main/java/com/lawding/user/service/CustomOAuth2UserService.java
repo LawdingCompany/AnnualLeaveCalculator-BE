@@ -63,7 +63,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             userNameAttributeName
         );
 
-        return new CustomOAuth2User(oAuth2User, user);
+        return new CustomOAuth2User(oAuth2User, user, userNameAttributeName);
     }
 
     private User saveOrUpdate(String email, String name, String provider) {
