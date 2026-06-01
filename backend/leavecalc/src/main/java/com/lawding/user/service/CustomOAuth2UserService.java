@@ -26,6 +26,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final AppleTokenValidator appleTokenValidator;
+
     /**
      * OAuth2 로그인 성공 시 호출되는 메서드
      * <p>
@@ -35,16 +36,21 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         String provider = userRequest.getClientRegistration().getRegistrationId();
-
+        String userNameAttributeName;
         Map<String, Object> attributes;
 
         if ("apple".equals(provider)) {
             String idToken = (String) userRequest.getAdditionalParameters().get("id_token");
+            userNameAttributeName = "sub";
             // 서명 검증 + claims 파싱
             attributes = appleTokenValidator.validateAndParseIdToken(idToken);
         } else {
             OAuth2User oAuth2User = super.loadUser(userRequest);
             attributes = oAuth2User.getAttributes();
+            userNameAttributeName = userRequest.getClientRegistration()
+                .getProviderDetails()
+                .getUserInfoEndpoint()
+                .getUserNameAttributeName();
         }
 
         OAuth2UserInfo userInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(provider, attributes);
@@ -53,7 +59,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = new DefaultOAuth2User(
             Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
             attributes,
-            "sub"
+            userNameAttributeName
         );
 
         return new CustomOAuth2User(oAuth2User, user);
