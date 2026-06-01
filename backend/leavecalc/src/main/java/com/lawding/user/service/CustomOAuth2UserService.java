@@ -6,7 +6,6 @@ import com.lawding.user.entity.User;
 import com.lawding.user.repository.UserRepository;
 import com.lawding.user.userinfo.OAuth2UserInfo;
 import com.lawding.user.userinfo.OAuth2UserInfoFactory;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +17,12 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
