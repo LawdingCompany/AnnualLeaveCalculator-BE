@@ -36,6 +36,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    // 애플 id_token 서명 검증
+    implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'
+
     // --- Querydsl ---
     implementation "com.querydsl:querydsl-jpa:5.1.0:jakarta"
     annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
