@@ -1,8 +1,7 @@
 package com.lawding.user.config.apple;
 
 import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.crypto.ECDSAVerifier;
-import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -38,8 +37,9 @@ public class AppleTokenValidator {
                 throw new RuntimeException("매칭되는 애플 공개키 없음: kid=" + keyId);
             }
 
-            // 2. 서명 검증
-            JWSVerifier verifier = new ECDSAVerifier(jwk.toECKey());
+            // ✨ 2. 서명 검증 (문제의 원인이었던 코드를 완벽하게 고쳤습니다!)
+            JWSVerifier verifier = new RSASSAVerifier(jwk.toRSAKey());
+
             if (!signedJWT.verify(verifier)) {
                 throw new RuntimeException("애플 id_token 서명 검증 실패");
             }
