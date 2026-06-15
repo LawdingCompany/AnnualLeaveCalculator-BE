@@ -3,7 +3,7 @@ package com.lawding.auth.service;
 import com.lawding.auth.config.apple.AppleTokenValidator;
 import com.lawding.auth.dto.CustomOAuth2User;
 import com.lawding.auth.entity.User;
-import com.lawding.auth.repository.UserRepository;
+import com.lawding.auth.repository.AuthRepository;
 import com.lawding.auth.userinfo.OAuth2UserInfo;
 import com.lawding.auth.userinfo.OAuth2UserInfoFactory;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
     private final AppleTokenValidator appleTokenValidator;
 
     /**
@@ -67,7 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private User saveOrUpdate(String email, String username, String provider) {
-        User user = userRepository.findByEmail(email)
+        User user = authRepository.findByEmail(email)
             .map(entity -> {
                 if (username != null) {
                     entity.updateUsername(username);
@@ -80,6 +80,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .username(username != null ? username : "Apple User")
                 .provider(provider)
                 .build());
-        return userRepository.save(user);
+        return authRepository.save(user);
     }
 }

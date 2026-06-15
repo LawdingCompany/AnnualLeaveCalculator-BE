@@ -50,7 +50,7 @@ public class LeaveYearlyBalance {
     @Column(nullable = false)
     private Integer usedLeaveMinutes;   // 사용한 연차 시간(분)
 
-    private Boolean isFinalized;    // 해당 기간 연차 마감 여부
+    private Boolean isFinalized = false;    // 해당 기간 연차 마감 여부
 
     @CreatedDate
     @Column(updatable = false)
@@ -62,23 +62,37 @@ public class LeaveYearlyBalance {
     @Builder
     public LeaveYearlyBalance(User user, LocalDate startDate, LocalDate endDate,
         Integer weeklyWorkingDays, BigDecimal avgDailyWorkHours,
-        Integer totalLeaveMinutes) {
+        Integer totalLeaveMinutes, Integer usedLeaveMinutes) {
         this.user = user;
         this.startDate = startDate;
         this.endDate = endDate;
         this.weeklyWorkingDays = weeklyWorkingDays;
         this.avgDailyWorkHours = avgDailyWorkHours;
         this.totalLeaveMinutes = totalLeaveMinutes;
-        this.usedLeaveMinutes = 0;
-        this.isFinalized = false;
+        this.usedLeaveMinutes = usedLeaveMinutes;
     }
 
-    public void deductLeave(int minutes) {
+    public static LeaveYearlyBalance create(User user, LocalDate startDate, LocalDate endDate,
+        Integer weeklyWorkingDays, BigDecimal avgDailyWorkHours,
+        Integer totalLeaveMinutes, Integer usedLeaveMinutes) {
+        return LeaveYearlyBalance.builder()
+            .user(user)
+            .startDate(startDate)
+            .endDate(endDate)
+            .weeklyWorkingDays(weeklyWorkingDays)
+            .avgDailyWorkHours(avgDailyWorkHours)
+            .totalLeaveMinutes(totalLeaveMinutes)
+            .usedLeaveMinutes(usedLeaveMinutes)
+            .build();
+    }
+
+    public void useLeave(int minutes) {
         if (this.isFinalized) {
             throw new IllegalStateException("이미 마감된 연차 기간입니다.");
         }
-        if (this.usedLeaveMinutes + minutes > this.totalLeaveMinutes) {
-            throw new IllegalArgumentException("잔여 연차 시간을 초과하여 사용할 수 없습니다.");
+        int remainingMinutes = getRemainingMinutes();
+        if (minutes > remainingMinutes) {
+            throw new IllegalArgumentException("잔여 연차가 부족합니다.");
         }
         this.usedLeaveMinutes += minutes;
     }
@@ -91,10 +105,4 @@ public class LeaveYearlyBalance {
         return this.totalLeaveMinutes - this.usedLeaveMinutes;
     }
 
-    /**
-     * 주어진 날짜가 이 연차 정산 기간에 포함되는지 확인
-     */
-    public boolean containsDate(LocalDate date) {
-        return !date.isBefore(this.startDate) && !date.isAfter(this.endDate);
-    }
 }

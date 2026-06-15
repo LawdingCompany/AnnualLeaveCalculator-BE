@@ -3,7 +3,7 @@ package com.lawding.auth.handler;
 import com.lawding.auth.dto.CustomOAuth2User;
 import com.lawding.auth.entity.User;
 import com.lawding.auth.jwt.JwtProvider;
-import com.lawding.auth.repository.UserRepository;
+import com.lawding.auth.repository.AuthRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtProvider jwtProvider;
-    private final UserRepository userRepository;
+    private final AuthRepository authRepository;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -40,7 +40,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 //            .build().toUriString();
 
         user.updateRefreshToken(refreshToken);
-        userRepository.save(user);
+        authRepository.save(user);
         // 🚧 [테스트용] 앱 주소 대신 로컬 웹 주소로 리다이렉트!
         String targetUrl = UriComponentsBuilder.fromUriString("https://lawding.net/test/login-success")
             .queryParam("accessToken", accessToken)

@@ -77,6 +77,28 @@ public class UserLeavePolicy {
         this.nextLeaveAccrualDate = nextLeaveAccrualDate;
     }
 
+    // ✔ 핵심 팩토리 메서드
+    public static UserLeavePolicy create(User user,
+        LocalDateTime acceptedAt,
+        LeaveAccrualBasis basis,
+        LocalDate joinDate,
+        Integer fiscalYearBaseMonth,
+        Integer companySize,
+        WorkPattern workPattern,
+        LocalDate nextLeaveAccrualDate) {
+
+        return UserLeavePolicy.builder()
+            .user(user)
+            .acceptedAt(acceptedAt)
+            .leaveAccrualBasis(basis)
+            .joinDate(joinDate)
+            .fiscalYearBaseMonth(fiscalYearBaseMonth)
+            .companySize(companySize)
+            .workPattern(workPattern)
+            .nextLeaveAccrualDate(nextLeaveAccrualDate)
+            .build();
+    }
+
     public void updateWorkPattern(WorkPattern  workPattern) {
         this.workPattern = workPattern;
     }

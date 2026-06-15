@@ -31,33 +31,22 @@ public class JwtProvider {
         this.refreshTokenExpirationMs = refreshTokenExpirationMs;
     }
 
-    // 1. JWT Access Token 생성기
-    // 토큰 안에 식별자인 유저 ID(PK)를 넣어둡니다.
-    public String createAccessToken(Long userId, String email) {
+    private String createToken(Long userId, long expirationMs) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + accessTokenExpirationMs);
-
-        return Jwts.builder()
-            .subject(String.valueOf(userId)) // Token의 주인을 userId로 설정!
-            .claim("email", email)           // 추가 데이터(Claim)로 이메일도 살짝 넣어줌
-            .issuedAt(now)
-            .expiration(expiryDate)
-            .signWith(secretKey, Jwts.SIG.HS256) // 우리만의 비밀키로 서명!
-            .compact();
-    }
-
-    // 2. JWT Refresh Token 생성기 (새로 추가!)
-    // RT는 보통 추가 데이터(Claim) 없이 유저 ID 정도만 최소한으로 넣어둡니다.
-    public String createRefreshToken(Long userId) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + refreshTokenExpirationMs);
-
         return Jwts.builder()
             .subject(String.valueOf(userId))
             .issuedAt(now)
-            .expiration(expiryDate)
+            .expiration(new Date(now.getTime() + expirationMs))
             .signWith(secretKey, Jwts.SIG.HS256)
             .compact();
+    }
+
+    public String createAccessToken(Long userId) {
+        return createToken(userId, accessTokenExpirationMs);
+    }
+
+    public String createRefreshToken(Long userId) {
+        return createToken(userId, refreshTokenExpirationMs);
     }
 
     // 3. JWT 토큰 유효성 검증기 (기존과 동일 - AT, RT 둘 다 이 메서드로 검증 가능!)
