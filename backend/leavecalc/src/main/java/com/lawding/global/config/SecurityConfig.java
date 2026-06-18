@@ -47,7 +47,7 @@ public class SecurityConfig {
             .oauth2Login(oauth2 -> oauth2
                 // 애플 통신을 위해 우리가 만든 커스텀 클라이언트 주입
                 .redirectionEndpoint(redirection ->
-                    redirection.baseUri("/login/oauth2/code/*"))
+                    redirection.baseUri("/v1/login/oauth2/code/*"))
                 .tokenEndpoint(token -> token.accessTokenResponseClient(
                     customOAuth2AccessTokenClient))
                 // 성공적으로 정보를 받아왔을 때, 우리 DB에 저장하는 서비스 주입
