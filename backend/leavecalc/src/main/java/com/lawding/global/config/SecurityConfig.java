@@ -1,9 +1,9 @@
 package com.lawding.global.config;
 
-import com.lawding.user.client.CustomOAuth2AccessTokenClient;
-import com.lawding.user.filter.JwtAuthenticationFilter;
-import com.lawding.user.handler.OAuth2SuccessHandler;
-import com.lawding.user.service.CustomOAuth2UserService;
+import com.lawding.auth.client.CustomOAuth2AccessTokenClient;
+import com.lawding.auth.filter.JwtAuthenticationFilter;
+import com.lawding.auth.handler.OAuth2SuccessHandler;
+import com.lawding.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
