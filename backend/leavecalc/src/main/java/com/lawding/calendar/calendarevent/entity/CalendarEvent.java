@@ -14,7 +14,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -108,18 +107,22 @@ public class CalendarEvent {
     }
 
     public void update(
+        LeaveYearlyBalance leaveYearlyBalance,
         String title,
         String description,
         LocalDateTime startDatetime,
         LocalDateTime endDatetime,
         Integer usedLeaveMinutes,
-        Boolean isAllDay
+        Boolean isAllDay,
+        Boolean isLeaveEvent
     ) {
+        this.leaveYearlyBalance = leaveYearlyBalance;
         this.title = title;
         this.description = description;
         this.startDatetime = startDatetime;
         this.endDatetime = endDatetime;
         this.usedLeaveMinutes = usedLeaveMinutes;
         this.isAllDay = isAllDay;
+        this.isLeaveEvent = isLeaveEvent;
     }
 }

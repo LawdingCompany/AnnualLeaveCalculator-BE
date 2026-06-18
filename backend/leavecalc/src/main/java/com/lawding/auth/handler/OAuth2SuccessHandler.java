@@ -31,18 +31,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // 2. 캡슐 안에서 우리 서비스의 진짜 유저 객체만 쏙 빼기! (DB 조회 불필요✨)
         User user = customOAuth2User.getUser();
         // 3. 토큰 발급
-        String accessToken = jwtProvider.createAccessToken(user.getId(), user.getEmail());
+        String accessToken = jwtProvider.createAccessToken(user.getId());
         String refreshToken = jwtProvider.createRefreshToken(userId); // RT 발급 추가!
-//        // 4. 플러터 앱을 깨우는 커스텀 스킴 주소로 변경! (lawding은 예시, 원하는 이름으로 설정 가능)
-//        String targetUrl = UriComponentsBuilder.fromUriString("lawding://login/success")
-//            .queryParam("token", accessToken)
-//            .queryParam("refreshToken", refreshToken)
-//            .build().toUriString();
 
         user.updateRefreshToken(refreshToken);
         authRepository.save(user);
         // 🚧 [테스트용] 앱 주소 대신 로컬 웹 주소로 리다이렉트!
-        String targetUrl = UriComponentsBuilder.fromUriString("https://lawding.net/test/login-success")
+        String targetUrl = UriComponentsBuilder.fromUriString("ggimiowner.annualleavecalculator://oauth/callback")
             .queryParam("accessToken", accessToken)
             .queryParam("refreshToken", refreshToken)
             .build().toUriString();

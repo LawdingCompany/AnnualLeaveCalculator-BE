@@ -22,6 +22,7 @@ public class LeaveYearlyBalanceRepositoryCustomImpl implements LeaveYearlyBalanc
                 leaveYearlyBalance.startDate.loe(targetDate),
                 // endDate >= targetDate (goe: greater or equal)
                 leaveYearlyBalance.endDate.goe(targetDate),
+                leaveYearlyBalance.user.id.eq(userId),
                 // 마감된 데이터인가? (isFinalized == false)
                 leaveYearlyBalance.isFinalized.isFalse()
             ).fetchOne();

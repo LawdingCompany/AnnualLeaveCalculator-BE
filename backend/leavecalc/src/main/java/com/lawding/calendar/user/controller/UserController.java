@@ -28,4 +28,5 @@ public class UserController {
         userService.saveUserLeavePolicy(userId, request);
         return ResponseEntity.ok(ApiResponse.okMessage("사용자 기본 정보가 등록되었습니다."));
     }
+
 }

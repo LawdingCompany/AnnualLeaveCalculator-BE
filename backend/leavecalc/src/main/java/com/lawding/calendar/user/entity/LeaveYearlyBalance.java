@@ -90,11 +90,27 @@ public class LeaveYearlyBalance {
         if (this.isFinalized) {
             throw new IllegalStateException("이미 마감된 연차 기간입니다.");
         }
+        if (minutes < 0) {
+            throw new IllegalArgumentException("사용 연차 시간은 0 이상이어야 합니다.");
+        }
         int remainingMinutes = getRemainingMinutes();
         if (minutes > remainingMinutes) {
             throw new IllegalArgumentException("잔여 연차가 부족합니다.");
         }
         this.usedLeaveMinutes += minutes;
+    }
+
+    public void cancelUsedLeave(int minutes) {
+        if (this.isFinalized) {
+            throw new IllegalStateException("이미 마감된 연차 기간입니다.");
+        }
+        if (minutes < 0) {
+            throw new IllegalArgumentException("복구할 연차 시간은 0 이상이어야 합니다.");
+        }
+        if (minutes > this.usedLeaveMinutes) {
+            throw new IllegalArgumentException("복구할 연차 시간이 사용 연차 시간보다 큽니다.");
+        }
+        this.usedLeaveMinutes -= minutes;
     }
 
     public void finalizeBalance() {
