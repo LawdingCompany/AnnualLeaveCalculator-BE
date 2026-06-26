@@ -116,6 +116,7 @@ public class UserServiceImpl implements UserService {
             usedLeaveMinutes);
 
         leaveYearlyBalanceRepository.save(balance);
+        user.completeOnboarding();
     }
 
     private User findUser(Long userId) {

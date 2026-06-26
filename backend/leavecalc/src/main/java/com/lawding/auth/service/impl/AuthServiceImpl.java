@@ -43,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
         return TokenResponse.builder()
             .accessToken(newAccessToken)
             .refreshToken(newRefreshToken)
+            .onboardingCompleted(user.getOnboardingCompleted())
             .build();
     }
 }

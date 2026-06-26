@@ -40,6 +40,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String targetUrl = UriComponentsBuilder.fromUriString("ggimiowner.annualleavecalculator://oauth/callback")
             .queryParam("accessToken", accessToken)
             .queryParam("refreshToken", refreshToken)
+            .queryParam("onboardingCompleted", user.getOnboardingCompleted())
             .build().toUriString();
 
         log.info("[Login Success] provider={}, userId={}", user.getProvider(), user.getId());

@@ -21,8 +21,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<TokenResponse>> reissue(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        log.info("[req] POST /auth/reissue - AT,RT 재발급 요청");
+    public ResponseEntity<ApiResponse<TokenResponse>> reissue(
+        @RequestBody RefreshTokenRequest refreshTokenRequest) {
+        log.info("[req] POST /auth/reissue - token reissue request");
         TokenResponse tokenResponse = authService.reissue(refreshTokenRequest.refreshToken());
         return ResponseEntity.ok(ApiResponse.ok(tokenResponse));
     }

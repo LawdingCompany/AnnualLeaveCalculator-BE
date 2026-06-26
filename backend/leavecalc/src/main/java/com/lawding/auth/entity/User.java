@@ -44,6 +44,9 @@ public class User {
     @Column(length = 512)
     private String refreshToken;
 
+    @Column(nullable = false)
+    private Boolean onboardingCompleted = false;
+
     @Builder
     public User(String username, String email, String provider) {
         this.username = username;
@@ -67,5 +70,9 @@ public class User {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void completeOnboarding() {
+        this.onboardingCompleted = true;
     }
 }
