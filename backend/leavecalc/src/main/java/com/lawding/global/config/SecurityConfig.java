@@ -35,12 +35,7 @@ public class SecurityConfig {
 
             // 🔥 URL별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-//                // 연차 계산기 관련 API와 기본 화면은 무조건 통과!
-//                .requestMatchers("/", "/api/leavecalc/**", "/login**").permitAll()
-//                // 캘린더 API는 반드시 소셜 로그인을 완료한 유저만 통과!
-                .requestMatchers("/calendar-events/**").authenticated()
-//                // 그 외 모든 요청도 일단 보호
-//                .anyRequest().authenticated()
+                .requestMatchers("/calendar-events/**", "/users/**").authenticated()
                     .anyRequest().permitAll()
             )
 
