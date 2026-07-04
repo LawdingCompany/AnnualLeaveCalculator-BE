@@ -1,6 +1,9 @@
 package com.lawding.auth.jwt;
 
+import com.lawding.global.exception.ClientException;
+import com.lawding.global.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -18,13 +21,10 @@ public class JwtProvider {
     private final long refreshTokenExpirationMs;
 
     public JwtProvider(
-        @Value("${app.jwt.secret}")
-        String secret,
-        @Value("${app.jwt.access-expiration}")
-        long accessTokenExpirationMs,
-        @Value("${app.jwt.refresh-expiration}")
-        long refreshTokenExpirationMs) {
-        // Base64로 인코딩된 키를 디코딩해서 안전한 SecretKey 객체로 만듭니다.
+        @Value("${app.jwt.secret}") String secret,
+        @Value("${app.jwt.access-expiration}") long accessTokenExpirationMs,
+        @Value("${app.jwt.refresh-expiration}") long refreshTokenExpirationMs
+    ) {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
         this.accessTokenExpirationMs = accessTokenExpirationMs;
@@ -49,30 +49,26 @@ public class JwtProvider {
         return createToken(userId, refreshTokenExpirationMs);
     }
 
-    // 3. JWT 토큰 유효성 검증기 (기존과 동일 - AT, RT 둘 다 이 메서드로 검증 가능!)
     public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                .verifyWith(secretKey) // 이 키로 서명된 게 맞는지 확인!
-                .build()
-                .parseSignedClaims(token);
-            return true; // 에러가 안 나면 정상 토큰!
-        } catch (JwtException | IllegalArgumentException e) {
-            // 토큰이 조작되었거나, 만료되었거나, 비어있을 경우 모두 여기로 빠집니다.
-            System.out.println("유효하지 않은 JWT 토큰입니다: " + e.getMessage());
-            return false;
-        }
+        parseClaims(token);
+        return true;
     }
 
-    // 4. 토큰에서 유저 ID 꺼내기
-    // 검증이 끝난 토큰을 분해해서 안에 들어있는 userId를 꺼냅니다.
     public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-            .verifyWith(secretKey)
-            .build()
-            .parseSignedClaims(token)
-            .getPayload(); // 0.12.x 최신 문법 (getBody() 대신 getPayload())
+        return Long.parseLong(parseClaims(token).getSubject());
+    }
 
-        return Long.parseLong(claims.getSubject());
+    private Claims parseClaims(String token) {
+        try {
+            return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        } catch (ExpiredJwtException e) {
+            throw new ClientException(ErrorCode.TOKEN_EXPIRED);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new ClientException(ErrorCode.INVALID_TOKEN);
+        }
     }
 }

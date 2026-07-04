@@ -8,7 +8,8 @@ import com.lawding.calendar.calendarevent.repository.CalendarEventRepository;
 import com.lawding.calendar.calendarevent.service.CalendarEventService;
 import com.lawding.calendar.user.entity.LeaveYearlyBalance;
 import com.lawding.calendar.user.repository.LeaveYearlyBalanceRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.lawding.global.exception.ClientException;
+import com.lawding.global.exception.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -123,26 +124,26 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
     private User findUser(Long userId) {
         validateUserId(userId);
-        return authRepository.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. id=" + userId));
+        return authRepository.findByIdAndDeletedFalse(userId)
+            .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
     }
 
     private CalendarEvent findOwnedEvent(Long userId, Long eventId) {
         return calendarEventRepository.findByIdAndUser_Id(eventId, userId)
-            .orElseThrow(() -> new EntityNotFoundException("일정을 찾을 수 없습니다. id=" + eventId));
+            .orElseThrow(() -> new ClientException(ErrorCode.CALENDAR_EVENT_NOT_FOUND));
     }
 
     private LeaveYearlyBalance findCurrentBalance(Long userId, LocalDate targetDate) {
         LeaveYearlyBalance balance = leaveYearlyBalanceRepository.findCurrentBalance(userId, targetDate);
         if (balance == null) {
-            throw new EntityNotFoundException("해당 날짜에 사용 가능한 연차 정보가 없습니다.");
+            throw new ClientException(ErrorCode.CURRENT_LEAVE_BALANCE_NOT_FOUND);
         }
         return balance;
     }
 
     private void validateUserId(Long userId) {
         if (userId == null) {
-            throw new IllegalArgumentException("인증된 사용자 정보가 없습니다.");
+            throw new ClientException(ErrorCode.UNAUTHORIZED);
         }
     }
 
@@ -158,7 +159,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
     private void validateEventPeriod(LocalDateTime startDatetime, LocalDateTime endDatetime) {
         if (startDatetime.isAfter(endDatetime)) {
-            throw new IllegalArgumentException("일정 시작 시간은 종료 시간보다 이후일 수 없습니다.");
+            throw new ClientException(ErrorCode.CALENDAR_EVENT_PERIOD_INVALID, "일정 시작 시간은 종료 시간보다 이후일 수 없습니다.");
         }
     }
 }

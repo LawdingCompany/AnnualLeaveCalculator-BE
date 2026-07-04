@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserLeavePolicyRepository extends JpaRepository<UserLeavePolicy,Long> {
 
+    void deleteByUser_Id(Long userId);
 }

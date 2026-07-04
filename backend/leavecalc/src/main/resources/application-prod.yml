@@ -13,10 +13,10 @@ spring:
     hikari:
       maximum-pool-size: 5
       minimum-idle: 1
-      max-lifetime: 840000      # 14분 (IAM 토큰 15분 만료 전 자동 교체)
-      idle-timeout: 600000      # 10분
-      connection-timeout: 30000  # 30초
-      validation-timeout: 5000  # 5초
+      max-lifetime: 840000
+      idle-timeout: 600000
+      connection-timeout: 30000
+      validation-timeout: 5000
 
   jpa:
     hibernate:
@@ -68,7 +68,7 @@ spring:
             user-name-attribute: id
 
 server:
-  forward-headers-strategy: framework # API Gateway가 넘겨주는 도메인(https) 정보를 스프링이 인식하게 만듦
+  forward-headers-strategy: framework
 
 logging:
   level:
@@ -76,7 +76,6 @@ logging:
     root: INFO
     com.lawding: INFO
 
-# 서비스 커스텀 속성
 app:
   internal:
     secret: ${INTERNAL_AUTH_SECRET}
@@ -93,5 +92,8 @@ app:
 
   jwt:
     secret: ${JWT_SECRET}
-    access-expiration: 3600000 # 1시간
-    refresh-expiration: 1209600000   # RT: 14일 (1000 * 60 * 60 * 24 * 14)
+    access-expiration: 3600000
+    refresh-expiration: 1209600000
+
+  oauth:
+    redirect-url: ${APP_REDIRECT_URL}

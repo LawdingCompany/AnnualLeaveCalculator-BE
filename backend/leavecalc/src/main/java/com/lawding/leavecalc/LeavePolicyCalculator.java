@@ -8,7 +8,6 @@ import com.lawding.global.common.dto.DatePeriod;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,13 +23,13 @@ public class LeavePolicyCalculator {
      */
     public LocalDate calculateNextLeaveAccrualDate(
         LeaveAccrualBasis basis,
-        LocalDate joinDate,
+        LocalDate hireDate,
         Integer fiscalYearBaseMonth
     ) {
         return switch (basis) {
-            case HIRE_DATE -> joinDate.plusYears(1);
+            case HIRE_DATE -> hireDate.plusYears(1);
 
-            case FISCAL_YEAR -> calculateFiscalStart(joinDate, fiscalYearBaseMonth, joinDate)
+            case FISCAL_YEAR -> calculateFiscalStart(hireDate, fiscalYearBaseMonth, hireDate)
                 .plusYears(1);
         };
     }
@@ -45,16 +44,16 @@ public class LeavePolicyCalculator {
      */
     public DatePeriod calculateCurrentPeriod(
         LeaveAccrualBasis basis,
-        LocalDate joinDate,
+        LocalDate hireDate,
         Integer fiscalYearBaseMonth,
         LocalDate referenceDate
     ) {
 
         LocalDate startDate = switch (basis) {
             // 입사일 기준: 경과 연수만큼 이동
-            case HIRE_DATE -> calculateHireStart(joinDate, referenceDate);
+            case HIRE_DATE -> calculateHireStart(hireDate, referenceDate);
             // 회계연도 기준: 현재 기준 회계 시작일
-            case FISCAL_YEAR -> calculateFiscalStart(joinDate, fiscalYearBaseMonth, referenceDate);
+            case FISCAL_YEAR -> calculateFiscalStart(hireDate, fiscalYearBaseMonth, referenceDate);
         };
 
         // 연차 기간은 항상 1년 단위
@@ -69,15 +68,15 @@ public class LeavePolicyCalculator {
      * =========================
      *
      * 예:
-     * joinDate = 2024-03-01
+     * hireDate = 2024-03-01
      * now      = 2025-06-03
      * → 2025-03-01
      */
-    private LocalDate calculateHireStart(LocalDate joinDate, LocalDate now) {
+    private LocalDate calculateHireStart(LocalDate hireDate, LocalDate now) {
 
-        long years = YEARS.between(joinDate, now);
+        long years = YEARS.between(hireDate, now);
 
-        return joinDate.plusYears(years);
+        return hireDate.plusYears(years);
     }
 
     /**
@@ -90,7 +89,7 @@ public class LeavePolicyCalculator {
      * - 입사일이 그 이전이면 → 전년도 기준으로 보정
      */
     private LocalDate calculateFiscalStart(
-        LocalDate joinDate,
+        LocalDate hireDate,
         Integer baseMonth,
         LocalDate referenceDate
     ) {
@@ -98,7 +97,7 @@ public class LeavePolicyCalculator {
         LocalDate fiscalStart =
             LocalDate.of(referenceDate.getYear(), baseMonth, 1);
 
-        if (joinDate.isBefore(fiscalStart)) {
+        if (hireDate.isBefore(fiscalStart)) {
             fiscalStart = fiscalStart.minusYears(1);
         }
 
@@ -121,15 +120,21 @@ public class LeavePolicyCalculator {
      * weekly total minutes / 근무일수 → 하루 평균 근무시간(시간 단위) : 소수점 둘째자리까지 반올림
      */
     public BigDecimal calculateAvgDailyWorkHours(WorkPattern workPattern) {
+        return calculateAvgDailyWorkHours(workPattern, null);
+    }
+
+    public BigDecimal calculateAvgDailyWorkHours(WorkPattern workPattern, WorkPattern breakTimePattern) {
 
         long totalWeeklyMinutes = workPattern.totalWeeklyMinutes();
+        long totalBreakMinutes = breakTimePattern == null ? 0 : breakTimePattern.totalWeeklyMinutes();
+        long netWeeklyMinutes = Math.max(0, totalWeeklyMinutes - totalBreakMinutes);
         int workingDays = workPattern.weeklyWorkingDays();
 
         if (workingDays == 0) {
             return BigDecimal.ZERO;
         }
 
-        return BigDecimal.valueOf(totalWeeklyMinutes)
+        return BigDecimal.valueOf(netWeeklyMinutes)
             .divide(BigDecimal.valueOf(workingDays), 2, RoundingMode.HALF_UP)
             .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
     }

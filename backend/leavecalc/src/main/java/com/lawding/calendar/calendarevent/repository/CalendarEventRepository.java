@@ -15,4 +15,12 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Lo
     );
 
     Optional<CalendarEvent> findByIdAndUser_Id(Long id, Long userId);
+
+    void deleteByUser_Id(Long userId);
+
+    List<CalendarEvent> findAllByUser_IdAndIsLeaveEventTrueAndStartDatetimeLessThanEqualAndEndDatetimeGreaterThanEqualOrderByStartDatetimeDesc(
+        Long userId,
+        LocalDateTime periodEnd,
+        LocalDateTime periodStart
+    );
 }

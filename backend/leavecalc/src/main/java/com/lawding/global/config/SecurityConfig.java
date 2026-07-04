@@ -4,6 +4,10 @@ import com.lawding.auth.client.CustomOAuth2AccessTokenClient;
 import com.lawding.auth.filter.JwtAuthenticationFilter;
 import com.lawding.auth.handler.OAuth2SuccessHandler;
 import com.lawding.auth.service.CustomOAuth2UserService;
+import com.lawding.global.exception.ErrorCode;
+import com.lawding.global.security.RestAccessDeniedHandler;
+import com.lawding.global.security.RestAuthenticationEntryPoint;
+import com.lawding.global.security.SecurityErrorResponseWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -25,17 +29,25 @@ public class SecurityConfig {
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+    private final SecurityErrorResponseWriter securityErrorResponseWriter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .httpBasic(AbstractHttpConfigurer::disable)
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(restAccessDeniedHandler))
 
             // 🔥 URL별 접근 권한 설정
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/calendar-events/**", "/users/**").authenticated()
+                .requestMatchers("/calendar-events/**", "/users/**", "/dashboard/**").authenticated()
                     .anyRequest().permitAll()
             )
 
@@ -53,7 +65,7 @@ public class SecurityConfig {
                     log.error("queryString = {}", request.getQueryString());
                     log.error("cookies = {}", request.getHeader("Cookie"));
 
-                    response.sendRedirect("/login?error");
+                    securityErrorResponseWriter.write(request, response, ErrorCode.UNAUTHORIZED);
                 })
             )
             // ✨ 캘린더 접근 시 시큐리티 기본 필터보다 우리가 만든 JWT 문지기를 먼저 거치게 설정!

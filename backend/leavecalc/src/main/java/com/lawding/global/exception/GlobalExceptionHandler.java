@@ -2,6 +2,7 @@ package com.lawding.global.exception;
 
 import com.lawding.global.common.enums.Platform;
 import com.lawding.global.common.dto.response.ApiResponse;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Arrays;
@@ -29,12 +30,59 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleApplicationException(
         ApplicationException ex, HttpServletRequest req) {
 
-        log.error("ApplicationException at uri={}, msg={}, traceId={}",
-            path(req), ex.getMessage(), traceId(), ex);
-
         ErrorCode ec = ex.getErrorCode();
+        if (ex instanceof ClientException) {
+            log.warn("ClientException at uri={}, errorCode={}, msg={}, traceId={}",
+                path(req), ec.name(), ex.getMessage(), traceId());
+        } else {
+            log.error("ServerException at uri={}, errorCode={}, msg={}, traceId={}",
+                path(req), ec.name(), ex.getMessage(), traceId(), ex);
+        }
+
         return ResponseEntity.status(ec.getHttpStatus())
             .body(ApiResponse.error(ec.getCode(), ex.getMessage(), path(req), traceId()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleEntityNotFound(
+        EntityNotFoundException ex, HttpServletRequest req) {
+
+        log.warn("EntityNotFound at uri={}, msg={}, traceId={}",
+            path(req), ex.getMessage(), traceId());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(
+            ErrorCode.RESOURCE_NOT_FOUND.getCode(),
+            safeMessage(ex.getMessage(), ErrorCode.RESOURCE_NOT_FOUND.getHttpStatus()),
+            path(req), traceId()
+        ));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(
+        IllegalArgumentException ex, HttpServletRequest req) {
+
+        log.warn("IllegalArgument at uri={}, msg={}, traceId={}",
+            path(req), ex.getMessage(), traceId());
+
+        return ResponseEntity.badRequest().body(ApiResponse.error(
+            ErrorCode.INVALID_INPUT.getCode(),
+            safeMessage(ex.getMessage(), ErrorCode.INVALID_INPUT.getHttpStatus()),
+            path(req), traceId()
+        ));
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(
+        IllegalStateException ex, HttpServletRequest req) {
+
+        log.warn("IllegalState at uri={}, msg={}, traceId={}",
+            path(req), ex.getMessage(), traceId());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(
+            ErrorCode.INVALID_INPUT.getCode(),
+            safeMessage(ex.getMessage(), HttpStatus.CONFLICT),
+            path(req), traceId()
+        ));
     }
 
     // ---- DTO 유효성 검사 실패 (@Valid) → VALIDATION_FAILED ----

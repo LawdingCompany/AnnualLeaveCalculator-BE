@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,9 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private final JwtProvider jwtProvider;
     private final AuthRepository authRepository;
+
+    @Value("${app.oauth.redirect-url}")
+    private String appRedirectUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -36,8 +40,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         user.updateRefreshToken(refreshToken);
         authRepository.save(user);
-        // 🚧 [테스트용] 앱 주소 대신 로컬 웹 주소로 리다이렉트!
-        String targetUrl = UriComponentsBuilder.fromUriString("ggimiowner.annualleavecalculator://oauth/callback")
+
+        String targetUrl = UriComponentsBuilder.fromUriString(appRedirectUrl)
             .queryParam("accessToken", accessToken)
             .queryParam("refreshToken", refreshToken)
             .queryParam("onboardingCompleted", user.getOnboardingCompleted())

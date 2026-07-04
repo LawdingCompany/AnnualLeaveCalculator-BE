@@ -41,20 +41,24 @@ public class UserLeavePolicy {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private LocalDateTime acceptedAt;   // 약관 동의 시각
+    private LocalDateTime acceptedAt;
 
     @Enumerated(EnumType.STRING)
-    private LeaveAccrualBasis leaveAccrualBasis;    // 연차 산정 기준 (HIRE_DATE, FISCAL_YEAR)
+    private LeaveAccrualBasis leaveAccrualBasis;
 
-    private LocalDate joinDate; // 입사일
-    private Integer fiscalYearBaseMonth;    // 회계연도 시작 월
-    private Integer companySize;    // 상시 근로자 수
+    private LocalDate hireDate;
+    private Integer fiscalYearBaseMonth;
+    private Integer companySize;
 
     @Type(JsonType.class)
     @Column(columnDefinition = "json")
-    private WorkPattern workPattern; // 요일별 근무 패턴 정보
+    private WorkPattern workPattern;
 
-    private LocalDate nextLeaveAccrualDate; // 다음 연차 발생 예정일(배치 작업용)
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json")
+    private WorkPattern breakTimePattern;
+
+    private LocalDate nextLeaveAccrualDate;
 
     @CreatedDate
     @Column(updatable = false)
@@ -64,42 +68,73 @@ public class UserLeavePolicy {
     private LocalDateTime updatedAt;
 
     @Builder
-    public UserLeavePolicy(User user, LocalDateTime acceptedAt, LeaveAccrualBasis leaveAccrualBasis,
-        LocalDate joinDate, Integer fiscalYearBaseMonth, Integer companySize,
-        WorkPattern  workPattern, LocalDate nextLeaveAccrualDate) {
-        this.user = user;
-        this.acceptedAt = acceptedAt;
-        this.leaveAccrualBasis = leaveAccrualBasis;
-        this.joinDate = joinDate;
-        this.fiscalYearBaseMonth = fiscalYearBaseMonth;
-        this.companySize = companySize;
-        this.workPattern = workPattern;
-        this.nextLeaveAccrualDate = nextLeaveAccrualDate;
-    }
-
-    // ✔ 핵심 팩토리 메서드
-    public static UserLeavePolicy create(User user,
+    public UserLeavePolicy(
+        User user,
         LocalDateTime acceptedAt,
-        LeaveAccrualBasis basis,
-        LocalDate joinDate,
+        LeaveAccrualBasis leaveAccrualBasis,
+        LocalDate hireDate,
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        LocalDate nextLeaveAccrualDate) {
+        WorkPattern breakTimePattern,
+        LocalDate nextLeaveAccrualDate
+    ) {
+        this.user = user;
+        this.acceptedAt = acceptedAt;
+        this.leaveAccrualBasis = leaveAccrualBasis;
+        this.hireDate = hireDate;
+        this.fiscalYearBaseMonth = fiscalYearBaseMonth;
+        this.companySize = companySize;
+        this.workPattern = workPattern;
+        this.breakTimePattern = breakTimePattern;
+        this.nextLeaveAccrualDate = nextLeaveAccrualDate;
+    }
 
+    public static UserLeavePolicy create(
+        User user,
+        LocalDateTime acceptedAt,
+        LeaveAccrualBasis basis,
+        LocalDate hireDate,
+        Integer fiscalYearBaseMonth,
+        Integer companySize,
+        WorkPattern workPattern,
+        WorkPattern breakTimePattern,
+        LocalDate nextLeaveAccrualDate
+    ) {
         return UserLeavePolicy.builder()
             .user(user)
             .acceptedAt(acceptedAt)
             .leaveAccrualBasis(basis)
-            .joinDate(joinDate)
+            .hireDate(hireDate)
             .fiscalYearBaseMonth(fiscalYearBaseMonth)
             .companySize(companySize)
             .workPattern(workPattern)
+            .breakTimePattern(breakTimePattern)
             .nextLeaveAccrualDate(nextLeaveAccrualDate)
             .build();
     }
 
-    public void updateWorkPattern(WorkPattern  workPattern) {
+    public void update(
+        LocalDateTime acceptedAt,
+        LeaveAccrualBasis basis,
+        LocalDate hireDate,
+        Integer fiscalYearBaseMonth,
+        Integer companySize,
+        WorkPattern workPattern,
+        WorkPattern breakTimePattern,
+        LocalDate nextLeaveAccrualDate
+    ) {
+        this.acceptedAt = acceptedAt;
+        this.leaveAccrualBasis = basis;
+        this.hireDate = hireDate;
+        this.fiscalYearBaseMonth = fiscalYearBaseMonth;
+        this.companySize = companySize;
+        this.workPattern = workPattern;
+        this.breakTimePattern = breakTimePattern;
+        this.nextLeaveAccrualDate = nextLeaveAccrualDate;
+    }
+
+    public void updateWorkPattern(WorkPattern workPattern) {
         this.workPattern = workPattern;
     }
 

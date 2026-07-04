@@ -1,6 +1,8 @@
 package com.lawding.calendar.user.entity;
 
 import com.lawding.auth.entity.User;
+import com.lawding.global.exception.ClientException;
+import com.lawding.global.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -88,33 +90,44 @@ public class LeaveYearlyBalance {
 
     public void useLeave(int minutes) {
         if (this.isFinalized) {
-            throw new IllegalStateException("이미 마감된 연차 기간입니다.");
+            throw new ClientException(ErrorCode.LEAVE_BALANCE_FINALIZED);
         }
         if (minutes < 0) {
-            throw new IllegalArgumentException("사용 연차 시간은 0 이상이어야 합니다.");
+            throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID, "사용 연차 시간은 0 이상이어야 합니다.");
         }
         int remainingMinutes = getRemainingMinutes();
         if (minutes > remainingMinutes) {
-            throw new IllegalArgumentException("잔여 연차가 부족합니다.");
+            throw new ClientException(ErrorCode.LEAVE_BALANCE_NOT_ENOUGH);
         }
         this.usedLeaveMinutes += minutes;
     }
 
     public void cancelUsedLeave(int minutes) {
         if (this.isFinalized) {
-            throw new IllegalStateException("이미 마감된 연차 기간입니다.");
+            throw new ClientException(ErrorCode.LEAVE_BALANCE_FINALIZED);
         }
         if (minutes < 0) {
-            throw new IllegalArgumentException("복구할 연차 시간은 0 이상이어야 합니다.");
+            throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID, "복구할 연차 시간은 0 이상이어야 합니다.");
         }
         if (minutes > this.usedLeaveMinutes) {
-            throw new IllegalArgumentException("복구할 연차 시간이 사용 연차 시간보다 큽니다.");
+            throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID, "복구할 연차 시간이 사용 연차 시간보다 큽니다.");
         }
         this.usedLeaveMinutes -= minutes;
     }
 
     public void finalizeBalance() {
         this.isFinalized = true;
+    }
+
+    public void updateBalance(LocalDate startDate, LocalDate endDate,
+        Integer weeklyWorkingDays, BigDecimal avgDailyWorkHours,
+        Integer totalLeaveMinutes, Integer usedLeaveMinutes) {
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.weeklyWorkingDays = weeklyWorkingDays;
+        this.avgDailyWorkHours = avgDailyWorkHours;
+        this.totalLeaveMinutes = totalLeaveMinutes;
+        this.usedLeaveMinutes = usedLeaveMinutes;
     }
 
     public int getRemainingMinutes() {
