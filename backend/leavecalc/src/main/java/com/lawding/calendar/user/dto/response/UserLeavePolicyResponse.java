@@ -15,7 +15,6 @@ public record UserLeavePolicyResponse(
     Integer companySize,
     WorkPattern workPattern,
     WorkPattern breakTimePattern,
-    LocalDate nextLeaveAccrualDate,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -31,7 +30,6 @@ public record UserLeavePolicyResponse(
             policy.getCompanySize(),
             policy.getWorkPattern(),
             policy.getBreakTimePattern(),
-            policy.getNextLeaveAccrualDate(),
             policy.getCreatedAt(),
             policy.getUpdatedAt()
         );

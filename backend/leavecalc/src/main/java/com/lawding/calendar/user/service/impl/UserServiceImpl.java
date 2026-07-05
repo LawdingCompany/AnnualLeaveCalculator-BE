@@ -122,7 +122,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public LeaveDashboardResponse getLeaveDashboard(Long userId) {
         findActiveUser(userId);
-        UserLeavePolicy policy = findPolicy(userId);
         LeaveYearlyBalance balance = leaveYearlyBalanceRepository
             .findTopByUser_IdOrderByIdDesc(userId)
             .orElseThrow(() -> new ClientException(ErrorCode.LEAVE_BALANCE_NOT_FOUND));
@@ -140,7 +139,7 @@ public class UserServiceImpl implements UserService {
             balance.getRemainingMinutes(),
             balance.getAvgDailyWorkHours(),
             balance.getTotalLeaveMinutes(),
-            policy.getNextLeaveAccrualDate(),
+            balance.getEndDate().plusDays(1),
             balance.getRemainingMinutes(),
             balance.getStartDate(),
             balance.getEndDate(),
@@ -170,11 +169,6 @@ public class UserServiceImpl implements UserService {
         LocalDateTime acceptedAt = LocalDateTime.now();
         user.updateNickname(request.nickname());
 
-        LocalDate nextLeaveAccrualDate = LPCalculator.calculateNextLeaveAccrualDate(
-            basis,
-            request.hireDate(),
-            request.fiscalYearBaseMonth());
-
         UserLeavePolicy policy = userLeavePolicyRepository.findById(userId)
             .map(existing -> {
                 existing.update(
@@ -184,8 +178,7 @@ public class UserServiceImpl implements UserService {
                     request.fiscalYearBaseMonth(),
                     request.companySize(),
                     request.workPattern(),
-                    request.breakTimePattern(),
-                    nextLeaveAccrualDate
+                    request.breakTimePattern()
                 );
                 return existing;
             })
@@ -197,8 +190,7 @@ public class UserServiceImpl implements UserService {
                 request.fiscalYearBaseMonth(),
                 request.companySize(),
                 request.workPattern(),
-                request.breakTimePattern(),
-                nextLeaveAccrualDate
+                request.breakTimePattern()
             ));
 
         UserLeavePolicy savedPolicy = userLeavePolicyRepository.save(policy);

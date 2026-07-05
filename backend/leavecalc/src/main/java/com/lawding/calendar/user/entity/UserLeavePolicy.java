@@ -58,8 +58,6 @@ public class UserLeavePolicy {
     @Column(columnDefinition = "json")
     private WorkPattern breakTimePattern;
 
-    private LocalDate nextLeaveAccrualDate;
-
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -76,8 +74,7 @@ public class UserLeavePolicy {
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        WorkPattern breakTimePattern,
-        LocalDate nextLeaveAccrualDate
+        WorkPattern breakTimePattern
     ) {
         this.user = user;
         this.acceptedAt = acceptedAt;
@@ -87,7 +84,6 @@ public class UserLeavePolicy {
         this.companySize = companySize;
         this.workPattern = workPattern;
         this.breakTimePattern = breakTimePattern;
-        this.nextLeaveAccrualDate = nextLeaveAccrualDate;
     }
 
     public static UserLeavePolicy create(
@@ -98,8 +94,7 @@ public class UserLeavePolicy {
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        WorkPattern breakTimePattern,
-        LocalDate nextLeaveAccrualDate
+        WorkPattern breakTimePattern
     ) {
         return UserLeavePolicy.builder()
             .user(user)
@@ -110,7 +105,6 @@ public class UserLeavePolicy {
             .companySize(companySize)
             .workPattern(workPattern)
             .breakTimePattern(breakTimePattern)
-            .nextLeaveAccrualDate(nextLeaveAccrualDate)
             .build();
     }
 
@@ -121,8 +115,7 @@ public class UserLeavePolicy {
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        WorkPattern breakTimePattern,
-        LocalDate nextLeaveAccrualDate
+        WorkPattern breakTimePattern
     ) {
         this.acceptedAt = acceptedAt;
         this.leaveAccrualBasis = basis;
@@ -131,14 +124,10 @@ public class UserLeavePolicy {
         this.companySize = companySize;
         this.workPattern = workPattern;
         this.breakTimePattern = breakTimePattern;
-        this.nextLeaveAccrualDate = nextLeaveAccrualDate;
     }
 
     public void updateWorkPattern(WorkPattern workPattern) {
         this.workPattern = workPattern;
     }
 
-    public void updateNextLeaveAccrualDate(LocalDate nextLeaveAccrualDate) {
-        this.nextLeaveAccrualDate = nextLeaveAccrualDate;
-    }
 }
