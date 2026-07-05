@@ -5,4 +5,6 @@ import com.lawding.auth.dto.response.TokenResponse;
 public interface AuthService {
 
     TokenResponse reissue(String refreshToken);
+
+    TokenResponse issueTestToken(Long userId, String email);
 }

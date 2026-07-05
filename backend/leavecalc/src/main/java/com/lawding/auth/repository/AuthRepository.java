@@ -12,6 +12,8 @@ public interface AuthRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
+    Optional<User> findByEmailAndDeletedFalse(String email);
+
     Optional<User> findByIdAndDeletedFalse(Long id);
 
     List<User> findAllByDeletedTrueAndHardDeleteScheduledAtLessThanEqual(LocalDateTime now);

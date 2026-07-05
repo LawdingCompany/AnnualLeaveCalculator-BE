@@ -48,4 +48,31 @@ public class AuthServiceImpl implements AuthService {
             .onboardingCompleted(user.getOnboardingCompleted())
             .build();
     }
+
+    @Transactional
+    @Override
+    public TokenResponse issueTestToken(Long userId, String email) {
+        User user = findTestTokenUser(userId, email);
+        String accessToken = jwtProvider.createAccessToken(user.getId());
+        String refreshToken = jwtProvider.createRefreshToken(user.getId());
+        user.updateRefreshToken(refreshToken);
+
+        return TokenResponse.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken)
+            .onboardingCompleted(user.getOnboardingCompleted())
+            .build();
+    }
+
+    private User findTestTokenUser(Long userId, String email) {
+        if (userId != null) {
+            return authRepository.findByIdAndDeletedFalse(userId)
+                .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
+        }
+        if (email != null && !email.isBlank()) {
+            return authRepository.findByEmailAndDeletedFalse(email)
+                .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
+        }
+        throw new ClientException(ErrorCode.INVALID_INPUT, "userId 또는 email 중 하나는 필수입니다.");
+    }
 }
