@@ -9,14 +9,11 @@ public record UserLeavePolicyResponse(
     Long userId,
     LocalDateTime acceptedAt,
     Integer leaveAccrualBasis,
-    String leaveAccrualBasisName,
     LocalDate hireDate,
     Integer fiscalYearBaseMonth,
     Integer companySize,
     WorkPattern workPattern,
-    WorkPattern breakTimePattern,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    WorkPattern breakTimePattern
 ) {
 
     public static UserLeavePolicyResponse from(UserLeavePolicy policy) {
@@ -24,14 +21,11 @@ public record UserLeavePolicyResponse(
             policy.getUserId(),
             policy.getAcceptedAt(),
             policy.getLeaveAccrualBasis().getCode(),
-            policy.getLeaveAccrualBasis().name(),
             policy.getHireDate(),
             policy.getFiscalYearBaseMonth(),
             policy.getCompanySize(),
             policy.getWorkPattern(),
-            policy.getBreakTimePattern(),
-            policy.getCreatedAt(),
-            policy.getUpdatedAt()
+            policy.getBreakTimePattern()
         );
     }
 }

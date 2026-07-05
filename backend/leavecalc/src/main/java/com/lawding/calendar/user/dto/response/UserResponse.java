@@ -1,7 +1,6 @@
 package com.lawding.calendar.user.dto.response;
 
 import com.lawding.auth.entity.User;
-import java.time.LocalDateTime;
 
 public record UserResponse(
     Long id,
@@ -10,11 +9,7 @@ public record UserResponse(
     String provider,
     String nickname,
     Boolean onboardingCompleted,
-    Boolean deleted,
-    LocalDateTime deletedAt,
-    LocalDateTime hardDeleteScheduledAt,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    Boolean deleted
 ) {
 
     public static UserResponse from(User user) {
@@ -25,11 +20,7 @@ public record UserResponse(
             user.getProvider(),
             user.getNickname(),
             user.getOnboardingCompleted(),
-            user.isDeleted(),
-            user.getDeletedAt(),
-            user.getHardDeleteScheduledAt(),
-            user.getCreatedAt(),
-            user.getUpdatedAt()
+            user.isDeleted()
         );
     }
 }

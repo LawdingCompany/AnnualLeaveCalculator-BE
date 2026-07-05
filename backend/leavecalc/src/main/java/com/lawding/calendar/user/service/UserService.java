@@ -1,7 +1,7 @@
 package com.lawding.calendar.user.service;
 
-import com.lawding.calendar.user.dto.request.UserRequest;
 import com.lawding.calendar.user.dto.request.UserLeavePolicyRequest;
+import com.lawding.calendar.user.dto.request.UserNicknameRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveDashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
@@ -14,9 +14,11 @@ public interface UserService {
 
     UserResponse getUser(Long userId);
 
-    UserResponse updateUser(Long userId, UserRequest request);
+    UserResponse updateUser(Long userId, UserNicknameRequest request);
 
     void deleteUser(Long userId);
+
+    UserResponse cancelDeleteUser(Long userId);
 
     UserLeavePolicyResponse getUserLeavePolicy(Long userId);
 

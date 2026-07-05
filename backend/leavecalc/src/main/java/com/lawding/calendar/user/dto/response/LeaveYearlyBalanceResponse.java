@@ -3,7 +3,6 @@ package com.lawding.calendar.user.dto.response;
 import com.lawding.calendar.user.entity.LeaveYearlyBalance;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 public record LeaveYearlyBalanceResponse(
     Long id,
@@ -15,9 +14,7 @@ public record LeaveYearlyBalanceResponse(
     Integer totalLeaveMinutes,
     Integer usedLeaveMinutes,
     Integer remainingLeaveMinutes,
-    Boolean isFinalized,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    Boolean isFinalized
 ) {
 
     public static LeaveYearlyBalanceResponse from(LeaveYearlyBalance balance) {
@@ -31,9 +28,7 @@ public record LeaveYearlyBalanceResponse(
             balance.getTotalLeaveMinutes(),
             balance.getUsedLeaveMinutes(),
             balance.getRemainingMinutes(),
-            balance.getIsFinalized(),
-            balance.getCreatedAt(),
-            balance.getUpdatedAt()
+            balance.getIsFinalized()
         );
     }
 }

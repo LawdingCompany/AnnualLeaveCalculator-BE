@@ -105,6 +105,12 @@ public class User {
         this.refreshToken = null;
     }
 
+    public void cancelSoftDelete() {
+        this.deleted = false;
+        this.deletedAt = null;
+        this.hardDeleteScheduledAt = null;
+    }
+
     public boolean isDeleted() {
         return Boolean.TRUE.equals(this.deleted);
     }

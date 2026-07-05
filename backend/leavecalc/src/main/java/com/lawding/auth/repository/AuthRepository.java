@@ -16,5 +16,7 @@ public interface AuthRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByIdAndDeletedFalse(Long id);
 
+    Optional<User> findByIdAndDeletedTrue(Long id);
+
     List<User> findAllByDeletedTrueAndHardDeleteScheduledAtLessThanEqual(LocalDateTime now);
 }

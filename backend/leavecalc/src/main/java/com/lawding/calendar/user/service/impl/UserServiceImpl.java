@@ -5,7 +5,7 @@ import com.lawding.auth.repository.AuthRepository;
 import com.lawding.calendar.calendarevent.entity.CalendarEvent;
 import com.lawding.calendar.calendarevent.repository.CalendarEventRepository;
 import com.lawding.calendar.user.dto.request.UserLeavePolicyRequest;
-import com.lawding.calendar.user.dto.request.UserRequest;
+import com.lawding.calendar.user.dto.request.UserNicknameRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveDashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
@@ -23,7 +23,6 @@ import com.lawding.global.exception.ClientException;
 import com.lawding.global.exception.ErrorCode;
 import com.lawding.leavecalc.LeavePolicyCalculator;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -49,13 +48,11 @@ public class UserServiceImpl implements UserService {
     public DashboardResponse getDashBoard(Long userId) {
         User user = findActiveUser(userId);
         LeaveYearlyBalance balance = findCurrentBalance(userId, LocalDate.now());
-        int remainingMinutes = balance.getRemainingMinutes();
 
         return new DashboardResponse(
             user.getNickname(),
-            remainingMinutes,
-            calculateRemainingDays(remainingMinutes, balance.getAvgDailyWorkHours()),
-            calculateRemainingHours(remainingMinutes)
+            balance.getRemainingMinutes(),
+            balance.getAvgDailyWorkHours()
         );
     }
 
@@ -67,9 +64,9 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserResponse updateUser(Long userId, UserRequest request) {
+    public UserResponse updateUser(Long userId, UserNicknameRequest request) {
         User user = findActiveUser(userId);
-        user.updateProfile(request.username(), request.email(), request.provider(), request.nickname());
+        user.updateNickname(request.nickname());
         return UserResponse.from(user);
     }
 
@@ -78,6 +75,16 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userId) {
         User user = findActiveUser(userId);
         user.softDelete(LocalDateTime.now());
+    }
+
+    @Transactional
+    @Override
+    public UserResponse cancelDeleteUser(Long userId) {
+        validateUserId(userId);
+        User user = authRepository.findByIdAndDeletedTrue(userId)
+            .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
+        user.cancelSoftDelete();
+        return UserResponse.from(user);
     }
 
     @Transactional(readOnly = true)
@@ -285,18 +292,4 @@ public class UserServiceImpl implements UserService {
         return value == null ? 0 : value;
     }
 
-    private BigDecimal calculateRemainingDays(int remainingMinutes, BigDecimal avgDailyWorkHours) {
-        if (avgDailyWorkHours == null || avgDailyWorkHours.compareTo(BigDecimal.ZERO) <= 0) {
-            return BigDecimal.ZERO.setScale(3);
-        }
-
-        BigDecimal dailyWorkMinutes = avgDailyWorkHours.multiply(BigDecimal.valueOf(60));
-        return BigDecimal.valueOf(remainingMinutes)
-            .divide(dailyWorkMinutes, 3, RoundingMode.HALF_UP);
-    }
-
-    private BigDecimal calculateRemainingHours(int remainingMinutes) {
-        return BigDecimal.valueOf(remainingMinutes)
-            .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
-    }
 }
