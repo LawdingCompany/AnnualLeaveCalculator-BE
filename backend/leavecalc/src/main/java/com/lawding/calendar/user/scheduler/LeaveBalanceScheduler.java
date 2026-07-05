@@ -16,8 +16,7 @@ public class LeaveBalanceScheduler {
     private final LeaveYearlyBalanceRepository leaveYearlyBalanceRepository;
     private final LeaveBalanceRolloverService leaveBalanceRolloverService;
 
-//    @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Seoul")
-    @Scheduled(cron = "0 0 17 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 5 0 * * *", zone = "Asia/Seoul")
     public void finalizeExpiredBalancesAndCreateNext() {
         LocalDate today = LocalDate.now();
 
