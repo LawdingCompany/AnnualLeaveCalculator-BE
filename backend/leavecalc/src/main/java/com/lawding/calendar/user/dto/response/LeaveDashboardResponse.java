@@ -8,6 +8,7 @@ public record LeaveDashboardResponse(
     Integer availableLeaveMinutes,
     BigDecimal avgDailyWorkHours,
     Integer totalLeaveMinutes,
+    Integer leaveAccrualBasis,
     LocalDate nextLeaveAccrualDate,
     Integer expiringLeaveMinutes,
     LocalDate leavePeriodStartDate,

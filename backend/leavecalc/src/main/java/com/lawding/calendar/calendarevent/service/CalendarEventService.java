@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CalendarEventService {
 
-    void createEvent(Long userId, CalendarEventRequest request);
+    CalendarEvent createEvent(Long userId, CalendarEventRequest request);
 
     List<CalendarEvent> findEventsByMonth(Long userId, int year, int month);
 
