@@ -148,6 +148,9 @@ public class UserServiceImpl implements UserService {
             balance.getAvgDailyWorkHours(),
             balance.getTotalLeaveMinutes(),
             policy.getLeaveAccrualBasis().getCode(),
+            policy.getLeaveAccrualBasis() == LeaveAccrualBasis.FISCAL_YEAR
+                ? policy.getFiscalYearBaseMonth()
+                : null,
             balance.getEndDate().plusDays(1),
             balance.getRemainingMinutes(),
             balance.getStartDate(),
