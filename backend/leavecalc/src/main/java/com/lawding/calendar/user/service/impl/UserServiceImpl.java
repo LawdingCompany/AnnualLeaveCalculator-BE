@@ -142,6 +142,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public LeaveDashboardResponse getLeaveDashboard(Long userId) {
         findActiveUser(userId);
+        UserLeavePolicy policy = findPolicy(userId);
         LeaveYearlyBalance balance = leaveYearlyBalanceRepository
             .findTopByUser_IdOrderByIdDesc(userId)
             .orElseThrow(() -> new ClientException(ErrorCode.LEAVE_BALANCE_NOT_FOUND));
@@ -159,6 +160,10 @@ public class UserServiceImpl implements UserService {
             balance.getRemainingLeaveMinutes(),
             balance.getAvgDailyWorkHours(),
             balance.getTotalLeaveMinutes(),
+            policy.getLeaveAccrualBasis().getCode(),
+            policy.getLeaveAccrualBasis() == LeaveAccrualBasis.FISCAL_YEAR
+                ? policy.getFiscalYearBaseMonth()
+                : null,
             balance.getEndDate().plusDays(1),
             balance.getRemainingLeaveMinutes(),
             balance.getStartDate(),

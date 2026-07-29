@@ -30,7 +30,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     private final CalendarEventRepository calendarEventRepository;
 
     @Override
-    public void createEvent(Long userId, CalendarEventRequest request) {
+    public CalendarEvent createEvent(Long userId, CalendarEventRequest request) {
         validateEventPeriod(request.startDatetime(), request.endDatetime());
         User user = findUser(userId);
         LeaveYearlyBalance balance = findCurrentBalance(userId, request.startDatetime().toLocalDate());
@@ -52,7 +52,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
             request.isLeaveEvent()
         );
 
-        calendarEventRepository.save(event);
+        return calendarEventRepository.save(event);
     }
 
     @Transactional(readOnly = true)

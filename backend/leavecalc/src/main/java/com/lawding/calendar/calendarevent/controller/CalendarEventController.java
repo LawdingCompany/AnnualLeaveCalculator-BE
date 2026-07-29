@@ -1,6 +1,7 @@
 package com.lawding.calendar.calendarevent.controller;
 
 import com.lawding.calendar.calendarevent.dto.request.CalendarEventRequest;
+import com.lawding.calendar.calendarevent.dto.response.CalendarEventCreateResponse;
 import com.lawding.calendar.calendarevent.dto.response.CalendarEventResponse;
 import com.lawding.calendar.calendarevent.service.CalendarEventService;
 import com.lawding.global.common.dto.response.ApiResponse;
@@ -33,12 +34,15 @@ public class CalendarEventController {
     private final CalendarEventService calendarEventService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createEvent(
+    public ResponseEntity<ApiResponse<CalendarEventCreateResponse>> createEvent(
         @AuthenticationPrincipal Long userId,
         @RequestBody @Valid CalendarEventRequest request) {
         log.info("[req] POST /calendar-events - 일정 등록 요청, userId={}", userId);
-        calendarEventService.createEvent(userId, request);
-        return ResponseEntity.ok(ApiResponse.okMessage("일정이 등록되었습니다."));
+        return ResponseEntity.ok(
+            ApiResponse.ok(CalendarEventCreateResponse.from(
+                calendarEventService.createEvent(userId, request)
+            ))
+        );
     }
 
     @GetMapping
