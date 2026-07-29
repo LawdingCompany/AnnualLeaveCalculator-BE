@@ -6,6 +6,7 @@ import com.lawding.calendar.calendarevent.entity.CalendarEvent;
 import com.lawding.calendar.calendarevent.repository.CalendarEventRepository;
 import com.lawding.calendar.user.dto.request.UserLeavePolicyRequest;
 import com.lawding.calendar.user.dto.request.UserNicknameRequest;
+import com.lawding.calendar.user.dto.request.UpdateTotalLeaveMinutesRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveDashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
@@ -51,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
         return new DashboardResponse(
             user.getNickname(),
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getAvgDailyWorkHours()
         );
     }
@@ -125,6 +126,18 @@ public class UserServiceImpl implements UserService {
         return LeaveYearlyBalanceResponse.from(balance);
     }
 
+    @Transactional
+    @Override
+    public LeaveYearlyBalanceResponse updateCurrentTotalLeaveMinutes(
+        Long userId,
+        UpdateTotalLeaveMinutesRequest request
+    ) {
+        findActiveUser(userId);
+        LeaveYearlyBalance balance = findCurrentBalance(userId, LocalDate.now());
+        balance.updateTotalLeaveMinutes(request.totalLeaveMinutes());
+        return LeaveYearlyBalanceResponse.from(balance);
+    }
+
     @Transactional(readOnly = true)
     @Override
     public LeaveDashboardResponse getLeaveDashboard(Long userId) {
@@ -143,11 +156,11 @@ public class UserServiceImpl implements UserService {
             );
 
         return new LeaveDashboardResponse(
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getAvgDailyWorkHours(),
             balance.getTotalLeaveMinutes(),
             balance.getEndDate().plusDays(1),
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getStartDate(),
             balance.getEndDate(),
             leaveEvents.stream()

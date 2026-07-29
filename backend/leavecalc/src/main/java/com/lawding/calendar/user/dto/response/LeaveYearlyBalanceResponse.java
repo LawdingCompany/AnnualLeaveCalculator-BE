@@ -27,7 +27,7 @@ public record LeaveYearlyBalanceResponse(
             balance.getAvgDailyWorkHours(),
             balance.getTotalLeaveMinutes(),
             balance.getUsedLeaveMinutes(),
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getIsFinalized()
         );
     }
