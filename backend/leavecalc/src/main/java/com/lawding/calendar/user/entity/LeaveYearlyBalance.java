@@ -95,7 +95,7 @@ public class LeaveYearlyBalance {
         if (minutes < 0) {
             throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID, "사용 연차 시간은 0 이상이어야 합니다.");
         }
-        int remainingMinutes = getRemainingMinutes();
+        int remainingMinutes = getRemainingLeaveMinutes();
         if (minutes > remainingMinutes) {
             throw new ClientException(ErrorCode.LEAVE_BALANCE_NOT_ENOUGH);
         }
@@ -135,7 +135,10 @@ public class LeaveYearlyBalance {
             throw new ClientException(ErrorCode.LEAVE_BALANCE_FINALIZED);
         }
         if (totalLeaveMinutes == null || totalLeaveMinutes < 0) {
-            throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID);
+            throw new ClientException(
+                ErrorCode.LEAVE_MINUTES_INVALID,
+                "총 연차 시간은 0분 이상이어야 합니다."
+            );
         }
 
         int minimumTotalMinutes = Math.max(this.usedLeaveMinutes, scheduledLeaveMinutes);
@@ -146,7 +149,7 @@ public class LeaveYearlyBalance {
         this.totalLeaveMinutes = totalLeaveMinutes;
     }
 
-    public int getRemainingMinutes() {
+    public int getRemainingLeaveMinutes() {
         return this.totalLeaveMinutes - this.usedLeaveMinutes;
     }
 

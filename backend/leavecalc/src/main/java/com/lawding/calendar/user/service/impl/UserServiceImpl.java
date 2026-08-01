@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
         return new DashboardResponse(
             user.getNickname(),
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getAvgDailyWorkHours()
         );
     }
@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
             );
 
         return new LeaveDashboardResponse(
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getAvgDailyWorkHours(),
             balance.getTotalLeaveMinutes(),
             policy.getLeaveAccrualBasis().getCode(),
@@ -162,7 +162,7 @@ public class UserServiceImpl implements UserService {
                 ? policy.getFiscalYearBaseMonth()
                 : null,
             balance.getEndDate().plusDays(1),
-            balance.getRemainingMinutes(),
+            balance.getRemainingLeaveMinutes(),
             balance.getStartDate(),
             balance.getEndDate(),
             leaveEvents.stream()

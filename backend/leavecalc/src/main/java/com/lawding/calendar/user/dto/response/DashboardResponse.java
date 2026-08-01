@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public record DashboardResponse(
     String nickname,
-    Integer availableLeaveMinutes,
+    Integer remainingLeaveMinutes,
     BigDecimal avgDailyWorkHours
 ) {
 
