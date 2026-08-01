@@ -30,7 +30,6 @@ public class AnnualLeaveCalculationClient {
             .uri(CALCULATE_URL)
             .contentType(MediaType.APPLICATION_JSON)
             .header("X-Platform", "web")
-            .header("X-Test", "true")
             .body(Map.of(
                 "calculationType", basis.getCode(),
                 "hireDate", hireDate,

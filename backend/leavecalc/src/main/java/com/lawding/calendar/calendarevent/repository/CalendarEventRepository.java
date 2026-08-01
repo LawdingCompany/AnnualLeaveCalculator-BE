@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Long> {
 
@@ -23,4 +25,12 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Lo
         LocalDateTime periodEnd,
         LocalDateTime periodStart
     );
+
+    @Query("""
+        select coalesce(sum(e.usedLeaveMinutes), 0)
+        from CalendarEvent e
+        where e.leaveYearlyBalance.id = :balanceId
+          and e.isLeaveEvent = true
+        """)
+    Long sumUsedLeaveMinutesByBalanceId(@Param("balanceId") Long balanceId);
 }

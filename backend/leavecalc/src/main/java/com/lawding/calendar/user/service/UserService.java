@@ -18,8 +18,6 @@ public interface UserService {
 
     void deleteUser(Long userId);
 
-    UserResponse cancelDeleteUser(Long userId);
-
     UserLeavePolicyResponse getUserLeavePolicy(Long userId);
 
     void saveUserLeavePolicy(Long userId, UserLeavePolicyRequest request);
@@ -29,6 +27,8 @@ public interface UserService {
     void deleteUserLeavePolicy(Long userId);
 
     LeaveYearlyBalanceResponse getLatestLeaveYearlyBalance(Long userId);
+
+    LeaveYearlyBalanceResponse updateTotalLeaveMinutes(Long userId, Integer totalLeaveMinutes);
 
     LeaveDashboardResponse getLeaveDashboard(Long userId);
 }

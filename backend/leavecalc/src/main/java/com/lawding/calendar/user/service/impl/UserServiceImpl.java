@@ -74,17 +74,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         User user = findActiveUser(userId);
-        user.softDelete(LocalDateTime.now());
-    }
-
-    @Transactional
-    @Override
-    public UserResponse cancelDeleteUser(Long userId) {
-        validateUserId(userId);
-        User user = authRepository.findByIdAndDeletedTrue(userId)
-            .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
-        user.cancelSoftDelete();
-        return UserResponse.from(user);
+        calendarEventRepository.deleteByUser_Id(userId);
+        leaveYearlyBalanceRepository.deleteByUser_Id(userId);
+        userLeavePolicyRepository.deleteByUser_Id(userId);
+        authRepository.delete(user);
+        log.info("Hard deleted userId={}", userId);
     }
 
     @Transactional(readOnly = true)
@@ -119,9 +113,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public LeaveYearlyBalanceResponse getLatestLeaveYearlyBalance(Long userId) {
         findActiveUser(userId);
+        return LeaveYearlyBalanceResponse.from(
+            findCurrentBalance(userId, LocalDate.now())
+        );
+    }
+
+    @Transactional
+    @Override
+    public LeaveYearlyBalanceResponse updateTotalLeaveMinutes(
+        Long userId,
+        Integer totalLeaveMinutes
+    ) {
+        findActiveUser(userId);
         LeaveYearlyBalance balance = leaveYearlyBalanceRepository
-            .findTopByUser_IdOrderByIdDesc(userId)
-            .orElseThrow(() -> new ClientException(ErrorCode.LEAVE_BALANCE_NOT_FOUND));
+            .findCurrentBalanceForUpdate(userId, LocalDate.now())
+            .orElseThrow(() -> new ClientException(ErrorCode.CURRENT_LEAVE_BALANCE_NOT_FOUND));
+
+        int scheduledLeaveMinutes = Math.toIntExact(
+            calendarEventRepository.sumUsedLeaveMinutesByBalanceId(balance.getId())
+        );
+        balance.updateTotalLeaveMinutes(totalLeaveMinutes, scheduledLeaveMinutes);
+
         return LeaveYearlyBalanceResponse.from(balance);
     }
 
@@ -130,9 +142,7 @@ public class UserServiceImpl implements UserService {
     public LeaveDashboardResponse getLeaveDashboard(Long userId) {
         findActiveUser(userId);
         UserLeavePolicy policy = findPolicy(userId);
-        LeaveYearlyBalance balance = leaveYearlyBalanceRepository
-            .findTopByUser_IdOrderByIdDesc(userId)
-            .orElseThrow(() -> new ClientException(ErrorCode.LEAVE_BALANCE_NOT_FOUND));
+        LeaveYearlyBalance balance = findCurrentBalance(userId, LocalDate.now());
 
         LocalDateTime periodStart = balance.getStartDate().atStartOfDay();
         LocalDateTime periodEnd = balance.getEndDate().atTime(LocalTime.MAX);
@@ -159,18 +169,6 @@ public class UserServiceImpl implements UserService {
                 .map(RecentLeaveUsageResponse::from)
                 .toList()
         );
-    }
-
-    @Transactional
-    public void hardDeleteUsersDue(LocalDateTime now) {
-        for (User user : authRepository.findAllByDeletedTrueAndHardDeleteScheduledAtLessThanEqual(now)) {
-            Long userId = user.getId();
-            calendarEventRepository.deleteByUser_Id(userId);
-            leaveYearlyBalanceRepository.deleteByUser_Id(userId);
-            userLeavePolicyRepository.deleteByUser_Id(userId);
-            authRepository.delete(user);
-            log.info("Hard deleted userId={}", userId);
-        }
     }
 
     private UserLeavePolicy upsertUserLeavePolicy(Long userId, UserLeavePolicyRequest request) {
@@ -270,7 +268,7 @@ public class UserServiceImpl implements UserService {
 
     private User findActiveUser(Long userId) {
         validateUserId(userId);
-        return authRepository.findByIdAndDeletedFalse(userId)
+        return authRepository.findById(userId)
             .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
     }
 

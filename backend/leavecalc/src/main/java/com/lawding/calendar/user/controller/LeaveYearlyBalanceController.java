@@ -1,13 +1,17 @@
 package com.lawding.calendar.user.controller;
 
+import com.lawding.calendar.user.dto.request.UpdateTotalLeaveMinutesRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
 import com.lawding.calendar.user.service.UserService;
 import com.lawding.global.common.dto.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,5 +34,15 @@ public class LeaveYearlyBalanceController {
         @AuthenticationPrincipal Long userId
     ) {
         return ResponseEntity.ok(ApiResponse.ok(userService.getLatestLeaveYearlyBalance(userId)));
+    }
+
+    @PatchMapping("/leave-yearly-balance/total-minutes")
+    public ResponseEntity<ApiResponse<LeaveYearlyBalanceResponse>> updateTotalLeaveMinutes(
+        @AuthenticationPrincipal Long userId,
+        @Valid @RequestBody UpdateTotalLeaveMinutesRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.ok(
+            userService.updateTotalLeaveMinutes(userId, request.totalLeaveMinutes())
+        ));
     }
 }

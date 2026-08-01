@@ -33,6 +33,8 @@ public enum ErrorCode {
     LEAVE_BALANCE_FINALIZED(2105, HttpStatus.CONFLICT, "이미 마감된 연차 기간입니다."),
     LEAVE_MINUTES_INVALID(2106, HttpStatus.BAD_REQUEST, "연차 시간 값이 유효하지 않습니다."),
     LEAVE_BALANCE_NOT_ENOUGH(2107, HttpStatus.CONFLICT, "잔여 연차가 부족합니다."),
+    LEAVE_TOTAL_LESS_THAN_USED(2108, HttpStatus.CONFLICT,
+        "총 연차 시간은 이미 사용한 연차 시간보다 작을 수 없습니다."),
 
     CALENDAR_EVENT_NOT_FOUND(2201, HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다."),
     CALENDAR_EVENT_PERIOD_INVALID(2202, HttpStatus.BAD_REQUEST, "일정 기간이 유효하지 않습니다."),

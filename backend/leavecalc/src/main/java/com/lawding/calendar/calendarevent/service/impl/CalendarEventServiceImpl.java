@@ -82,7 +82,9 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     public void updateEvent(Long userId, Long eventId, CalendarEventRequest request) {
         validateEventPeriod(request.startDatetime(), request.endDatetime());
         CalendarEvent event = findOwnedEvent(userId, eventId);
-        LeaveYearlyBalance oldBalance = event.getLeaveYearlyBalance();
+        LeaveYearlyBalance oldBalance = findBalanceForUpdate(
+            event.getLeaveYearlyBalance().getId()
+        );
         int oldUsedMinutes = normalizeUsedLeaveMinutes(event.getUsedLeaveMinutes());
         int newUsedMinutes = effectiveUsedLeaveMinutes(request);
         boolean wasLeaveEvent = Boolean.TRUE.equals(event.getIsLeaveEvent());
@@ -115,7 +117,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
         CalendarEvent event = findOwnedEvent(userId, eventId);
 
         if (Boolean.TRUE.equals(event.getIsLeaveEvent())) {
-            event.getLeaveYearlyBalance()
+            findBalanceForUpdate(event.getLeaveYearlyBalance().getId())
                 .cancelUsedLeave(normalizeUsedLeaveMinutes(event.getUsedLeaveMinutes()));
         }
 
@@ -124,7 +126,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
 
     private User findUser(Long userId) {
         validateUserId(userId);
-        return authRepository.findByIdAndDeletedFalse(userId)
+        return authRepository.findById(userId)
             .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
     }
 
@@ -134,11 +136,13 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     }
 
     private LeaveYearlyBalance findCurrentBalance(Long userId, LocalDate targetDate) {
-        LeaveYearlyBalance balance = leaveYearlyBalanceRepository.findCurrentBalance(userId, targetDate);
-        if (balance == null) {
-            throw new ClientException(ErrorCode.CURRENT_LEAVE_BALANCE_NOT_FOUND);
-        }
-        return balance;
+        return leaveYearlyBalanceRepository.findCurrentBalanceForUpdate(userId, targetDate)
+            .orElseThrow(() -> new ClientException(ErrorCode.CURRENT_LEAVE_BALANCE_NOT_FOUND));
+    }
+
+    private LeaveYearlyBalance findBalanceForUpdate(Long balanceId) {
+        return leaveYearlyBalanceRepository.findByIdForUpdate(balanceId)
+            .orElseThrow(() -> new ClientException(ErrorCode.LEAVE_BALANCE_NOT_FOUND));
     }
 
     private void validateUserId(Long userId) {

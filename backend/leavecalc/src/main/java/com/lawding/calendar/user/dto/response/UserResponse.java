@@ -8,8 +8,7 @@ public record UserResponse(
     String email,
     String provider,
     String nickname,
-    Boolean onboardingCompleted,
-    Boolean deleted
+    Boolean onboardingCompleted
 ) {
 
     public static UserResponse from(User user) {
@@ -19,8 +18,7 @@ public record UserResponse(
             user.getEmail(),
             user.getProvider(),
             user.getNickname(),
-            user.getOnboardingCompleted(),
-            user.isDeleted()
+            user.getOnboardingCompleted()
         );
     }
 }

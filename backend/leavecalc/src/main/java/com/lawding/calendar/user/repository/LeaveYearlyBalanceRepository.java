@@ -15,9 +15,23 @@ import org.springframework.stereotype.Repository;
 public interface LeaveYearlyBalanceRepository extends JpaRepository<LeaveYearlyBalance, Long>,
     LeaveYearlyBalanceRepositoryCustom {
 
-    Optional<LeaveYearlyBalance> findTopByUser_IdOrderByStartDateDesc(Long userId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        select b
+        from LeaveYearlyBalance b
+        where b.user.id = :userId
+          and b.startDate <= :date
+          and b.endDate >= :date
+          and b.isFinalized = false
+        """)
+    Optional<LeaveYearlyBalance> findCurrentBalanceForUpdate(
+        @Param("userId") Long userId,
+        @Param("date") LocalDate date
+    );
 
-    Optional<LeaveYearlyBalance> findTopByUser_IdOrderByIdDesc(Long userId);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select b from LeaveYearlyBalance b where b.id = :id")
+    Optional<LeaveYearlyBalance> findByIdForUpdate(@Param("id") Long id);
 
     @Query("""
         select b.id

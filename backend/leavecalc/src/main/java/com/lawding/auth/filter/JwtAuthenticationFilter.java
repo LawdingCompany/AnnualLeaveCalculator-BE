@@ -54,4 +54,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         return null;
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String contextPath = request.getContextPath();
+        if (contextPath != null && !contextPath.isBlank() && path.startsWith(contextPath)) {
+            path = path.substring(contextPath.length());
+        }
+
+        return !path.equals("/calendar-events")
+               && !path.startsWith("/calendar-events/")
+               && !path.equals("/users")
+               && !path.startsWith("/users/")
+               && !path.equals("/dashboard")
+               && !path.startsWith("/dashboard/");
+    }
 }

@@ -33,7 +33,7 @@ public class AuthServiceImpl implements AuthService {
         log.debug("토큰 재발급 요청 ID = {}", userId);
 
         // 3. [보안 강화] DB의 RT와 비교 (가장 중요한 부분!)
-        User user = authRepository.findByIdAndDeletedFalse(userId)
+        User user = authRepository.findById(userId)
             .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
 
         // 3. 새로운 AT,RT 생성
@@ -66,11 +66,11 @@ public class AuthServiceImpl implements AuthService {
 
     private User findTestTokenUser(Long userId, String email) {
         if (userId != null) {
-            return authRepository.findByIdAndDeletedFalse(userId)
+            return authRepository.findById(userId)
                 .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
         }
         if (email != null && !email.isBlank()) {
-            return authRepository.findByEmailAndDeletedFalse(email)
+            return authRepository.findByEmail(email)
                 .orElseThrow(() -> new ClientException(ErrorCode.USER_NOT_FOUND));
         }
         throw new ClientException(ErrorCode.INVALID_INPUT, "userId 또는 email 중 하나는 필수입니다.");

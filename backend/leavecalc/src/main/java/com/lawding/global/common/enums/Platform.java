@@ -16,4 +16,18 @@ public enum Platform {
     public String getValue() {
         return value;
     }
+
+    public static boolean supports(String value) {
+        if (value == null || value.isBlank()) {
+            return false;
+        }
+
+        String normalized = value.trim();
+        for (Platform platform : values()) {
+            if (platform.value.equalsIgnoreCase(normalized)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

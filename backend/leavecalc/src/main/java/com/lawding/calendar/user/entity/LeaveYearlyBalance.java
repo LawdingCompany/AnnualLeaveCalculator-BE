@@ -130,6 +130,22 @@ public class LeaveYearlyBalance {
         this.usedLeaveMinutes = usedLeaveMinutes;
     }
 
+    public void updateTotalLeaveMinutes(Integer totalLeaveMinutes, int scheduledLeaveMinutes) {
+        if (Boolean.TRUE.equals(this.isFinalized)) {
+            throw new ClientException(ErrorCode.LEAVE_BALANCE_FINALIZED);
+        }
+        if (totalLeaveMinutes == null || totalLeaveMinutes < 0) {
+            throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID);
+        }
+
+        int minimumTotalMinutes = Math.max(this.usedLeaveMinutes, scheduledLeaveMinutes);
+        if (totalLeaveMinutes < minimumTotalMinutes) {
+            throw new ClientException(ErrorCode.LEAVE_TOTAL_LESS_THAN_USED);
+        }
+
+        this.totalLeaveMinutes = totalLeaveMinutes;
+    }
+
     public int getRemainingMinutes() {
         return this.totalLeaveMinutes - this.usedLeaveMinutes;
     }

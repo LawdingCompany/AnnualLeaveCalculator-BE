@@ -47,13 +47,6 @@ public class User {
     @Column(nullable = false)
     private Boolean onboardingCompleted = false;
 
-    @Column(nullable = false)
-    private Boolean deleted = false;
-
-    private LocalDateTime deletedAt;
-
-    private LocalDateTime hardDeleteScheduledAt;
-
     @Builder
     public User(String username, String email, String provider) {
         this.username = username;
@@ -98,20 +91,4 @@ public class User {
         this.onboardingCompleted = true;
     }
 
-    public void softDelete(LocalDateTime deletedAt) {
-        this.deleted = true;
-        this.deletedAt = deletedAt;
-        this.hardDeleteScheduledAt = deletedAt.plusDays(30);
-        this.refreshToken = null;
-    }
-
-    public void cancelSoftDelete() {
-        this.deleted = false;
-        this.deletedAt = null;
-        this.hardDeleteScheduledAt = null;
-    }
-
-    public boolean isDeleted() {
-        return Boolean.TRUE.equals(this.deleted);
-    }
 }

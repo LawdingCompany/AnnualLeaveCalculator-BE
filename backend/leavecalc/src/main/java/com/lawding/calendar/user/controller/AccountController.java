@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,11 +37,7 @@ public class AccountController {
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteProfile(@AuthenticationPrincipal Long userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok(ApiResponse.okMessage("사용자 삭제가 예약되었습니다."));
+        return ResponseEntity.ok(ApiResponse.okMessage("사용자가 영구 삭제되었습니다."));
     }
 
-    @PostMapping("/restore")
-    public ResponseEntity<ApiResponse<UserResponse>> restoreProfile(@AuthenticationPrincipal Long userId) {
-        return ResponseEntity.ok(ApiResponse.ok(userService.cancelDeleteUser(userId)));
-    }
 }
