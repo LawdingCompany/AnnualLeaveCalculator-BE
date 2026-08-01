@@ -5,10 +5,13 @@ import com.lawding.calendar.user.dto.request.UserNicknameRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveDashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
+import com.lawding.calendar.user.dto.response.UserContextResponse;
 import com.lawding.calendar.user.dto.response.UserLeavePolicyResponse;
 import com.lawding.calendar.user.dto.response.UserResponse;
 
 public interface UserService {
+
+    UserContextResponse getUserContext(Long userId);
 
     DashboardResponse getDashBoard(Long userId);
 

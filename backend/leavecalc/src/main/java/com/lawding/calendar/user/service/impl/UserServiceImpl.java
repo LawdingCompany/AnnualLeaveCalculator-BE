@@ -10,6 +10,7 @@ import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveDashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
 import com.lawding.calendar.user.dto.response.RecentLeaveUsageResponse;
+import com.lawding.calendar.user.dto.response.UserContextResponse;
 import com.lawding.calendar.user.dto.response.UserLeavePolicyResponse;
 import com.lawding.calendar.user.dto.response.UserResponse;
 import com.lawding.calendar.user.entity.LeaveYearlyBalance;
@@ -42,6 +43,27 @@ public class UserServiceImpl implements UserService {
     private final UserLeavePolicyRepository userLeavePolicyRepository;
     private final LeaveYearlyBalanceRepository leaveYearlyBalanceRepository;
     private final CalendarEventRepository calendarEventRepository;
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserContextResponse getUserContext(Long userId) {
+        User user = findActiveUser(userId);
+        UserLeavePolicyResponse leavePolicy = userLeavePolicyRepository.findById(userId)
+            .map(UserLeavePolicyResponse::from)
+            .orElse(null);
+
+        LeaveYearlyBalance currentBalance = leaveYearlyBalanceRepository
+            .findCurrentBalance(userId, LocalDate.now());
+        LeaveYearlyBalanceResponse leaveBalance = currentBalance == null
+            ? null
+            : LeaveYearlyBalanceResponse.from(currentBalance);
+
+        return new UserContextResponse(
+            UserResponse.from(user),
+            leavePolicy,
+            leaveBalance
+        );
+    }
 
     @Transactional(readOnly = true)
     @Override
