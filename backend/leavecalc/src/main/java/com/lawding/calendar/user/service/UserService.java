@@ -31,7 +31,10 @@ public interface UserService {
 
     LeaveYearlyBalanceResponse getLatestLeaveYearlyBalance(Long userId);
 
-    LeaveYearlyBalanceResponse updateTotalLeaveMinutes(Long userId, Integer totalLeaveMinutes);
+    LeaveYearlyBalanceResponse updateRemainingLeaveMinutes(
+        Long userId,
+        Integer remainingLeaveMinutes
+    );
 
     LeaveDashboardResponse getLeaveDashboard(Long userId);
 }

@@ -130,23 +130,28 @@ public class LeaveYearlyBalance {
         this.usedLeaveMinutes = usedLeaveMinutes;
     }
 
-    public void updateTotalLeaveMinutes(Integer totalLeaveMinutes, int scheduledLeaveMinutes) {
+    public void updateRemainingLeaveMinutes(Integer remainingLeaveMinutes) {
         if (Boolean.TRUE.equals(this.isFinalized)) {
             throw new ClientException(ErrorCode.LEAVE_BALANCE_FINALIZED);
         }
-        if (totalLeaveMinutes == null || totalLeaveMinutes < 0) {
+        if (remainingLeaveMinutes == null || remainingLeaveMinutes < 0) {
             throw new ClientException(
                 ErrorCode.LEAVE_MINUTES_INVALID,
-                "총 연차 시간은 0분 이상이어야 합니다."
+                "남은 연차 시간은 0분 이상이어야 합니다."
             );
         }
 
-        int minimumTotalMinutes = Math.max(this.usedLeaveMinutes, scheduledLeaveMinutes);
-        if (totalLeaveMinutes < minimumTotalMinutes) {
-            throw new ClientException(ErrorCode.LEAVE_TOTAL_LESS_THAN_USED);
+        try {
+            this.totalLeaveMinutes = Math.addExact(
+                this.usedLeaveMinutes,
+                remainingLeaveMinutes
+            );
+        } catch (ArithmeticException ex) {
+            throw new ClientException(
+                ErrorCode.LEAVE_MINUTES_INVALID,
+                "연차 시간이 허용 범위를 초과했습니다."
+            );
         }
-
-        this.totalLeaveMinutes = totalLeaveMinutes;
     }
 
     public int getRemainingLeaveMinutes() {

@@ -142,19 +142,16 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public LeaveYearlyBalanceResponse updateTotalLeaveMinutes(
+    public LeaveYearlyBalanceResponse updateRemainingLeaveMinutes(
         Long userId,
-        Integer totalLeaveMinutes
+        Integer remainingLeaveMinutes
     ) {
         findActiveUser(userId);
         LeaveYearlyBalance balance = leaveYearlyBalanceRepository
             .findCurrentBalanceForUpdate(userId, LocalDate.now())
             .orElseThrow(() -> new ClientException(ErrorCode.CURRENT_LEAVE_BALANCE_NOT_FOUND));
 
-        int scheduledLeaveMinutes = Math.toIntExact(
-            calendarEventRepository.sumUsedLeaveMinutesByBalanceId(balance.getId())
-        );
-        balance.updateTotalLeaveMinutes(totalLeaveMinutes, scheduledLeaveMinutes);
+        balance.updateRemainingLeaveMinutes(remainingLeaveMinutes);
 
         return LeaveYearlyBalanceResponse.from(balance);
     }

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.lawding.global.exception.ClientException;
-import com.lawding.global.exception.ErrorCode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
@@ -12,35 +11,42 @@ import org.junit.jupiter.api.Test;
 class LeaveYearlyBalanceTest {
 
     @Test
-    void updatesOnlyTotalLeaveMinutesAndRecalculatesRemainingMinutes() {
-        LeaveYearlyBalance balance = createBalance(7_200, 6_240);
+    void updatesRemainingMinutesByRecalculatingTotalMinutes() {
+        LeaveYearlyBalance balance = createBalance(7_200, 3_840);
 
-        balance.updateTotalLeaveMinutes(8_160, 6_240);
+        balance.updateRemainingLeaveMinutes(4_320);
 
         assertThat(balance.getTotalLeaveMinutes()).isEqualTo(8_160);
-        assertThat(balance.getUsedLeaveMinutes()).isEqualTo(6_240);
-        assertThat(balance.getRemainingLeaveMinutes()).isEqualTo(1_920);
+        assertThat(balance.getUsedLeaveMinutes()).isEqualTo(3_840);
+        assertThat(balance.getRemainingLeaveMinutes()).isEqualTo(4_320);
     }
 
     @Test
-    void rejectsTotalLowerThanPersistedUsedMinutes() {
-        LeaveYearlyBalance balance = createBalance(7_200, 6_240);
+    void updatesTotalToRemainingWhenNoLeaveHasBeenUsed() {
+        LeaveYearlyBalance balance = createBalance(7_680, 0);
 
-        assertThatThrownBy(() -> balance.updateTotalLeaveMinutes(5_760, 5_000))
-            .isInstanceOf(ClientException.class)
-            .extracting("errorCode")
-            .isEqualTo(ErrorCode.LEAVE_TOTAL_LESS_THAN_USED);
+        balance.updateRemainingLeaveMinutes(7_200);
+
         assertThat(balance.getTotalLeaveMinutes()).isEqualTo(7_200);
+        assertThat(balance.getRemainingLeaveMinutes()).isEqualTo(7_200);
     }
 
     @Test
-    void rejectsTotalLowerThanScheduledUsedMinutes() {
-        LeaveYearlyBalance balance = createBalance(7_200, 5_000);
+    void allowsZeroRemainingMinutes() {
+        LeaveYearlyBalance balance = createBalance(7_200, 3_840);
 
-        assertThatThrownBy(() -> balance.updateTotalLeaveMinutes(5_760, 6_240))
-            .isInstanceOf(ClientException.class)
-            .extracting("errorCode")
-            .isEqualTo(ErrorCode.LEAVE_TOTAL_LESS_THAN_USED);
+        balance.updateRemainingLeaveMinutes(0);
+
+        assertThat(balance.getTotalLeaveMinutes()).isEqualTo(3_840);
+        assertThat(balance.getRemainingLeaveMinutes()).isZero();
+    }
+
+    @Test
+    void rejectsNegativeRemainingMinutes() {
+        LeaveYearlyBalance balance = createBalance(7_200, 960);
+
+        assertThatThrownBy(() -> balance.updateRemainingLeaveMinutes(-1))
+            .isInstanceOf(ClientException.class);
         assertThat(balance.getTotalLeaveMinutes()).isEqualTo(7_200);
     }
 
@@ -49,7 +55,7 @@ class LeaveYearlyBalanceTest {
         LeaveYearlyBalance balance = createBalance(7_200, 960);
         balance.finalizeBalance();
 
-        assertThatThrownBy(() -> balance.updateTotalLeaveMinutes(8_160, 960))
+        assertThatThrownBy(() -> balance.updateRemainingLeaveMinutes(6_720))
             .isInstanceOf(ClientException.class);
         assertThat(balance.getTotalLeaveMinutes()).isEqualTo(7_200);
     }

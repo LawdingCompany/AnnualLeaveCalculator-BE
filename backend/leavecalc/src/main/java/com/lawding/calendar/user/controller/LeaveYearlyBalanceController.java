@@ -1,6 +1,6 @@
 package com.lawding.calendar.user.controller;
 
-import com.lawding.calendar.user.dto.request.UpdateTotalLeaveMinutesRequest;
+import com.lawding.calendar.user.dto.request.UpdateRemainingLeaveMinutesRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
 import com.lawding.calendar.user.dto.response.LeaveYearlyBalanceResponse;
 import com.lawding.calendar.user.service.UserService;
@@ -36,13 +36,13 @@ public class LeaveYearlyBalanceController {
         return ResponseEntity.ok(ApiResponse.ok(userService.getLatestLeaveYearlyBalance(userId)));
     }
 
-    @PatchMapping("/leave-yearly-balance/total-minutes")
-    public ResponseEntity<ApiResponse<LeaveYearlyBalanceResponse>> updateTotalLeaveMinutes(
+    @PatchMapping("/leave-yearly-balance/remaining-minutes")
+    public ResponseEntity<ApiResponse<LeaveYearlyBalanceResponse>> updateRemainingLeaveMinutes(
         @AuthenticationPrincipal Long userId,
-        @Valid @RequestBody UpdateTotalLeaveMinutesRequest request
+        @Valid @RequestBody UpdateRemainingLeaveMinutesRequest request
     ) {
         return ResponseEntity.ok(ApiResponse.ok(
-            userService.updateTotalLeaveMinutes(userId, request.totalLeaveMinutes())
+            userService.updateRemainingLeaveMinutes(userId, request.remainingLeaveMinutes())
         ));
     }
 }
