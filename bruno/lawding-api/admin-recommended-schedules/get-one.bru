@@ -1,0 +1,15 @@
+meta {
+  name: 추천 일정 단건 조회
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/admin/recommended-schedules/{{recommendedScheduleId}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-Platform: {{platform}}
+}

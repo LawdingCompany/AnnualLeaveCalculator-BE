@@ -1,0 +1,15 @@
+meta {
+  name: 추천 일정 삭제
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{baseUrl}}/admin/recommended-schedules/{{recommendedScheduleId}}
+  body: none
+  auth: none
+}
+
+headers {
+  X-Platform: {{platform}}
+}

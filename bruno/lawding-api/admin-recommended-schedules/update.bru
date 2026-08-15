@@ -1,0 +1,24 @@
+meta {
+  name: 추천 일정 수정
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/admin/recommended-schedules/{{recommendedScheduleId}}
+  body: json
+  auth: none
+}
+
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "name": "신정 연휴",
+    "startDate": "2028-01-01",
+    "endDate": "2028-01-04"
+  }
+}
