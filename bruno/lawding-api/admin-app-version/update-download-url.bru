@@ -1,0 +1,17 @@
+meta {
+  name: 다운로드 URL 수정
+  type: http
+  seq: 7
+}
+patch {
+  url: {{baseUrl}}/admin/app-versions/{{adminPlatform}}/download-url
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "downloadUrl": "https://play.google.com/store" }
+}

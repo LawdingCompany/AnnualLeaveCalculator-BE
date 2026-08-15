@@ -1,0 +1,16 @@
+meta {
+  name: 연차 정책 조회
+  type: http
+  seq: 1
+}
+get {
+  url: {{baseUrl}}/users/leave-policy
+  body: none
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+}
+auth:bearer {
+  token: {{accessToken}}
+}

@@ -1,0 +1,17 @@
+meta {
+  name: 관리자 사전 수정
+  type: http
+  seq: 4
+}
+patch {
+  url: {{baseUrl}}/admin/dictionaries/{{dictionaryId}}
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "categoryId": {{categoryId}}, "question": "수정된 질문", "content": "수정된 설명" }
+}

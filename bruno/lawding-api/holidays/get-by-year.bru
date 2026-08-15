@@ -1,0 +1,13 @@
+meta {
+  name: 연도별 공휴일 조회
+  type: http
+  seq: 1
+}
+get {
+  url: {{baseUrl}}/holidays?year=2026
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

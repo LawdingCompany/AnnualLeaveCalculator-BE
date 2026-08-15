@@ -1,0 +1,31 @@
+meta {
+  name: 연차 정책 등록
+  type: http
+  seq: 2
+}
+post {
+  url: {{baseUrl}}/users/leave-policy
+  body: json
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+auth:bearer {
+  token: {{accessToken}}
+}
+body:json {
+  {
+    "nickname": "로딩",
+    "acceptedTerms": true,
+    "leaveAccrualBasis": 1,
+    "fiscalYearBaseMonth": null,
+    "hireDate": "2025-01-01",
+    "workPattern": { "MONDAY": { "start": "09:00", "end": "18:00" }, "TUESDAY": { "start": "09:00", "end": "18:00" }, "WEDNESDAY": { "start": "09:00", "end": "18:00" }, "THURSDAY": { "start": "09:00", "end": "18:00" }, "FRIDAY": { "start": "09:00", "end": "18:00" } },
+    "breakTimePattern": { "MONDAY": { "start": "12:00", "end": "13:00" }, "TUESDAY": { "start": "12:00", "end": "13:00" }, "WEDNESDAY": { "start": "12:00", "end": "13:00" }, "THURSDAY": { "start": "12:00", "end": "13:00" }, "FRIDAY": { "start": "12:00", "end": "13:00" } },
+    "companySize": 5,
+    "totalLeave": 15,
+    "usedLeave": 0
+  }
+}

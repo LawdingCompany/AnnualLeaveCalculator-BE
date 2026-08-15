@@ -1,0 +1,13 @@
+meta {
+  name: 앱 버전 확인
+  type: http
+  seq: 1
+}
+get {
+  url: {{baseUrl}}/app/version-check?platform={{platform}}&client-version=1.0.0
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

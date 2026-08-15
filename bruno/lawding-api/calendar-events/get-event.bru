@@ -1,0 +1,16 @@
+meta {
+  name: 일정 단건 조회
+  type: http
+  seq: 5
+}
+get {
+  url: {{baseUrl}}/calendar-events/{{eventId}}
+  body: none
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+}
+auth:bearer {
+  token: {{accessToken}}
+}

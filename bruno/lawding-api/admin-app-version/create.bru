@@ -1,0 +1,17 @@
+meta {
+  name: 앱 버전 정책 등록
+  type: http
+  seq: 3
+}
+post {
+  url: {{baseUrl}}/admin/app-versions
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "platform": "android", "currentVersion": "1.0.0", "minimumVersion": "1.0.0", "updateMessage": "업데이트가 있습니다.", "downloadUrl": "https://play.google.com/store" }
+}

@@ -1,0 +1,13 @@
+meta {
+  name: 관리자 사전 비활성화
+  type: http
+  seq: 5
+}
+patch {
+  url: {{baseUrl}}/admin/dictionaries/{{dictionaryId}}/disable
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

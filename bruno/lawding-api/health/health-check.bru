@@ -1,0 +1,13 @@
+meta {
+  name: 헬스 체크
+  type: http
+  seq: 1
+}
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

@@ -1,0 +1,26 @@
+meta {
+  name: 남은 연차 시간 수정
+  type: http
+  seq: 2
+}
+
+patch {
+  url: {{baseUrl}}/users/leave-yearly-balance/remaining-minutes
+  body: json
+  auth: bearer
+}
+
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:json {
+  {
+    "remainingLeaveMinutes": 4320
+  }
+}

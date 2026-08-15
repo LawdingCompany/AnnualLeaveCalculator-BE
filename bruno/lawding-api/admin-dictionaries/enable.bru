@@ -1,0 +1,13 @@
+meta {
+  name: 관리자 사전 활성화
+  type: http
+  seq: 6
+}
+patch {
+  url: {{baseUrl}}/admin/dictionaries/{{dictionaryId}}/enable
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

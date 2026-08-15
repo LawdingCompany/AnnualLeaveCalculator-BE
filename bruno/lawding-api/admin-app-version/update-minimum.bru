@@ -1,0 +1,17 @@
+meta {
+  name: 최소 버전 수정
+  type: http
+  seq: 5
+}
+patch {
+  url: {{baseUrl}}/admin/app-versions/{{adminPlatform}}/minimum-version
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "minimumVersion": "1.0.0" }
+}

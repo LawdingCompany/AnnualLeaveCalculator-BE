@@ -1,0 +1,18 @@
+meta {
+  name: 피드백 등록
+  type: http
+  seq: 2
+}
+post {
+  url: {{baseUrl}}/feedback
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  X-Test: true
+  Content-Type: application/json
+}
+body:json {
+  { "type": "QUESTION", "content": "문의 내용", "email": "test@lawding.net", "rating": 5, "calculationId": null }
+}

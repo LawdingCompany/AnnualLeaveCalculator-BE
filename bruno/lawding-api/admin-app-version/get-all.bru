@@ -1,0 +1,13 @@
+meta {
+  name: 앱 버전 정책 전체 조회
+  type: http
+  seq: 1
+}
+get {
+  url: {{baseUrl}}/admin/app-versions
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

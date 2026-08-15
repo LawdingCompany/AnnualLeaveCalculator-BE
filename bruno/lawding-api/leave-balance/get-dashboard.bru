@@ -1,0 +1,16 @@
+meta {
+  name: 연차 대시보드 조회
+  type: http
+  seq: 4
+}
+get {
+  url: {{baseUrl}}/dashboard/leave
+  body: none
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+}
+auth:bearer {
+  token: {{accessToken}}
+}

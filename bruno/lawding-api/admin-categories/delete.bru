@@ -1,0 +1,13 @@
+meta {
+  name: 사전 카테고리 삭제
+  type: http
+  seq: 4
+}
+delete {
+  url: {{baseUrl}}/admin/dictionary-categories/{{categoryId}}
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

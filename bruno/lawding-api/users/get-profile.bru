@@ -1,0 +1,16 @@
+meta {
+  name: 프로필 조회
+  type: http
+  seq: 2
+}
+get {
+  url: {{baseUrl}}/users/me/profile
+  body: none
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+}
+auth:bearer {
+  token: {{accessToken}}
+}

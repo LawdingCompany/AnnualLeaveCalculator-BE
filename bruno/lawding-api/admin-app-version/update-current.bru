@@ -1,0 +1,17 @@
+meta {
+  name: 최신 버전 수정
+  type: http
+  seq: 4
+}
+patch {
+  url: {{baseUrl}}/admin/app-versions/{{adminPlatform}}/current-version
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "currentVersion": "1.1.0" }
+}

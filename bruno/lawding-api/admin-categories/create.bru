@@ -1,0 +1,17 @@
+meta {
+  name: 사전 카테고리 등록
+  type: http
+  seq: 2
+}
+post {
+  url: {{baseUrl}}/admin/dictionary-categories
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "name": "신규 카테고리" }
+}

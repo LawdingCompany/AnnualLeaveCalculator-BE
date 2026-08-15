@@ -1,0 +1,16 @@
+meta {
+  name: 연차 정책 삭제
+  type: http
+  seq: 4
+}
+delete {
+  url: {{baseUrl}}/users/leave-policy
+  body: none
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+}
+auth:bearer {
+  token: {{accessToken}}
+}

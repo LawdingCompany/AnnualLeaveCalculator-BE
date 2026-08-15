@@ -1,0 +1,17 @@
+meta {
+  name: 업데이트 메시지 수정
+  type: http
+  seq: 6
+}
+patch {
+  url: {{baseUrl}}/admin/app-versions/{{adminPlatform}}/update-message
+  body: json
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+  Content-Type: application/json
+}
+body:json {
+  { "updateMessage": "새 버전으로 업데이트해 주세요." }
+}

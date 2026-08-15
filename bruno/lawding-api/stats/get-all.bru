@@ -1,0 +1,13 @@
+meta {
+  name: 일자별 사용자 통계 조회
+  type: http
+  seq: 1
+}
+get {
+  url: {{baseUrl}}/stats
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

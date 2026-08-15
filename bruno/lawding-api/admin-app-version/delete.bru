@@ -1,0 +1,13 @@
+meta {
+  name: 앱 버전 정책 삭제
+  type: http
+  seq: 8
+}
+delete {
+  url: {{baseUrl}}/admin/app-versions/{{adminPlatform}}
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}

@@ -1,0 +1,16 @@
+meta {
+  name: 연차 요약 조회
+  type: http
+  seq: 3
+}
+get {
+  url: {{baseUrl}}/users/me/leave-summary
+  body: none
+  auth: bearer
+}
+headers {
+  X-Platform: {{platform}}
+}
+auth:bearer {
+  token: {{accessToken}}
+}

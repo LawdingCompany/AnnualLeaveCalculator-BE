@@ -1,0 +1,13 @@
+meta {
+  name: 사전 검색
+  type: http
+  seq: 3
+}
+get {
+  url: {{baseUrl}}/dictionaries/search?keyword=연차&page=0&size=6
+  body: none
+  auth: none
+}
+headers {
+  X-Platform: {{platform}}
+}
