@@ -1,3 +1,4 @@
+-- V3 follows the Java-based V2 CSV seed migration.
 CREATE TABLE recommended_schedules (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
