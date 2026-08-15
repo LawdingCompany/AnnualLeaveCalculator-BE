@@ -1,11 +1,10 @@
 package com.lawding.calendar.user.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.lawding.calendar.user.client.dto.AnnualLeaveCalculationRequest;
+import com.lawding.calendar.user.client.dto.AnnualLeaveCalculationResponse;
 import com.lawding.calendar.user.enums.LeaveAccrualBasis;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -21,49 +20,36 @@ public class AnnualLeaveCalculationClient {
         this.restClient = restClientBuilder.build();
     }
 
-    public BigDecimal calculateTotalLeaveDays(
+    public AnnualLeaveCalculationResponse calculate(
         LeaveAccrualBasis basis,
         LocalDate hireDate,
+        Integer fiscalYearBaseMonth,
         LocalDate referenceDate
     ) {
-        JsonNode response = restClient.post()
+        String fiscalYear = basis == LeaveAccrualBasis.FISCAL_YEAR
+            ? String.format("%02d-01", fiscalYearBaseMonth)
+            : null;
+        AnnualLeaveCalculationResponse response = restClient.post()
             .uri(CALCULATE_URL)
             .contentType(MediaType.APPLICATION_JSON)
             .header("X-Platform", "web")
-            .body(Map.of(
-                "calculationType", basis.getCode(),
-                "hireDate", hireDate,
-                "referenceDate", referenceDate
-            ))
+            .body(new AnnualLeaveCalculationRequest(
+                basis.getCode(), fiscalYear, hireDate, referenceDate, List.of(), List.of()))
             .retrieve()
-            .body(JsonNode.class);
+            .body(AnnualLeaveCalculationResponse.class);
 
-        if (response == null || response.get("calculationDetail") == null) {
-            return BigDecimal.ZERO;
+        if (response == null || response.calculationDetail() == null
+            || response.calculationDetail().totalLeaveDays() == null
+            || !hasAvailablePeriod(response)) {
+            throw new IllegalStateException("Invalid annual leave calculation response");
         }
-
-        return sumTotalLeaveDays(response.get("calculationDetail"));
+        return response;
     }
 
-    private BigDecimal sumTotalLeaveDays(JsonNode node) {
-        BigDecimal childTotal = BigDecimal.ZERO;
-
-        Iterator<JsonNode> children = node.elements();
-        while (children.hasNext()) {
-            JsonNode child = children.next();
-            if (child.isContainerNode()) {
-                childTotal = childTotal.add(sumTotalLeaveDays(child));
-            }
-        }
-
-        if (childTotal.compareTo(BigDecimal.ZERO) > 0) {
-            return childTotal;
-        }
-
-        if (node.has("totalLeaveDays") && node.get("totalLeaveDays").isNumber()) {
-            return node.get("totalLeaveDays").decimalValue();
-        }
-
-        return BigDecimal.ZERO;
+    private boolean hasAvailablePeriod(AnnualLeaveCalculationResponse response) {
+        var detail = response.calculationDetail();
+        if (detail.availablePeriod() != null) return true;
+        return detail.monthlyDetail() != null && detail.monthlyDetail().availablePeriod() != null
+            && detail.proratedDetail() != null && detail.proratedDetail().availablePeriod() != null;
     }
 }

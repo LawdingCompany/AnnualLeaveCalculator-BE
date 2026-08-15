@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.lawding.auth.entity.User;
 import com.lawding.auth.repository.AuthRepository;
 import com.lawding.calendar.calendarevent.repository.CalendarEventRepository;
+import com.lawding.calendar.calendarevent.repository.CalendarEventLeaveAllocationRepository;
 import com.lawding.calendar.user.dto.WorkPattern;
 import com.lawding.calendar.user.dto.response.UserContextResponse;
 import com.lawding.calendar.user.entity.LeaveYearlyBalance;
@@ -14,6 +15,9 @@ import com.lawding.calendar.user.entity.UserLeavePolicy;
 import com.lawding.calendar.user.enums.LeaveAccrualBasis;
 import com.lawding.calendar.user.repository.LeaveYearlyBalanceRepository;
 import com.lawding.calendar.user.repository.UserLeavePolicyRepository;
+import com.lawding.calendar.user.repository.LeaveGrantRepository;
+import com.lawding.calendar.user.service.LeaveLedgerService;
+import com.lawding.notification.repository.UserNotificationRepository;
 import com.lawding.leavecalc.LeavePolicyCalculator;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -43,6 +47,11 @@ class UserServiceImplTest {
 
     @Mock
     private CalendarEventRepository calendarEventRepository;
+
+    @Mock private CalendarEventLeaveAllocationRepository allocationRepository;
+    @Mock private LeaveGrantRepository leaveGrantRepository;
+    @Mock private LeaveLedgerService leaveLedgerService;
+    @Mock private UserNotificationRepository notificationRepository;
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -76,6 +85,9 @@ class UserServiceImplTest {
         when(userLeavePolicyRepository.findById(userId)).thenReturn(Optional.of(policy));
         when(leaveYearlyBalanceRepository.findCurrentBalance(any(Long.class), any(LocalDate.class)))
             .thenReturn(balance);
+        when(leaveLedgerService.getTotal(any(Long.class), any(LocalDate.class))).thenReturn(8_160);
+        when(leaveLedgerService.getUsed(any(Long.class), any(LocalDate.class))).thenReturn(960);
+        when(leaveLedgerService.getRemaining(any(Long.class), any(LocalDate.class))).thenReturn(7_200);
 
         UserContextResponse response = userService.getUserContext(userId);
 

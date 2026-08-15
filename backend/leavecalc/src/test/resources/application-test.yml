@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:lawding;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+  security:
+    oauth2:
+      client:
+        registration:
+          apple: { client-id: test-apple, client-secret: test, authorization-grant-type: authorization_code, redirect-uri: "http://localhost/login/oauth2/code/apple" }
+          google: { client-id: test-google, client-secret: test, authorization-grant-type: authorization_code, redirect-uri: "http://localhost/login/oauth2/code/google" }
+          kakao: { client-id: test-kakao, client-secret: test, authorization-grant-type: authorization_code, redirect-uri: "http://localhost/login/oauth2/code/kakao" }
+        provider:
+          apple: { authorization-uri: "https://example.com/auth", token-uri: "https://example.com/token" }
+          kakao: { authorization-uri: "https://example.com/auth", token-uri: "https://example.com/token", user-info-uri: "https://example.com/user", user-name-attribute: id }
+app:
+  internal: { secret: test-internal-secret }
+  apple: { team-id: test-team, key-id: test-key, private-key: test-private-key }
+  jwt:
+    secret: dGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldC0xMjM0NTY=
+    access-expiration: 3600000
+    refresh-expiration: 1209600000
+  oauth: { redirect-url: "http://localhost/callback" }

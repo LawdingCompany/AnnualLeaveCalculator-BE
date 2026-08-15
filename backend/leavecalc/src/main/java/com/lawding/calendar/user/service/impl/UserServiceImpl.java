@@ -4,6 +4,7 @@ import com.lawding.auth.entity.User;
 import com.lawding.auth.repository.AuthRepository;
 import com.lawding.calendar.calendarevent.entity.CalendarEvent;
 import com.lawding.calendar.calendarevent.repository.CalendarEventRepository;
+import com.lawding.calendar.calendarevent.repository.CalendarEventLeaveAllocationRepository;
 import com.lawding.calendar.user.dto.request.UserLeavePolicyRequest;
 import com.lawding.calendar.user.dto.request.UserNicknameRequest;
 import com.lawding.calendar.user.dto.response.DashboardResponse;
@@ -14,15 +15,21 @@ import com.lawding.calendar.user.dto.response.UserContextResponse;
 import com.lawding.calendar.user.dto.response.UserLeavePolicyResponse;
 import com.lawding.calendar.user.dto.response.UserResponse;
 import com.lawding.calendar.user.entity.LeaveYearlyBalance;
+import com.lawding.calendar.user.entity.LeaveGrant;
 import com.lawding.calendar.user.entity.UserLeavePolicy;
 import com.lawding.calendar.user.enums.LeaveAccrualBasis;
+import com.lawding.calendar.user.enums.LeaveGrantSource;
+import com.lawding.calendar.user.enums.LeaveGrantType;
+import com.lawding.calendar.user.repository.LeaveGrantRepository;
 import com.lawding.calendar.user.repository.LeaveYearlyBalanceRepository;
 import com.lawding.calendar.user.repository.UserLeavePolicyRepository;
 import com.lawding.calendar.user.service.UserService;
+import com.lawding.calendar.user.service.LeaveLedgerService;
 import com.lawding.global.common.dto.DatePeriod;
 import com.lawding.global.exception.ClientException;
 import com.lawding.global.exception.ErrorCode;
 import com.lawding.leavecalc.LeavePolicyCalculator;
+import com.lawding.notification.repository.UserNotificationRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +50,10 @@ public class UserServiceImpl implements UserService {
     private final UserLeavePolicyRepository userLeavePolicyRepository;
     private final LeaveYearlyBalanceRepository leaveYearlyBalanceRepository;
     private final CalendarEventRepository calendarEventRepository;
+    private final CalendarEventLeaveAllocationRepository allocationRepository;
+    private final LeaveGrantRepository leaveGrantRepository;
+    private final LeaveLedgerService leaveLedgerService;
+    private final UserNotificationRepository notificationRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -54,9 +65,9 @@ public class UserServiceImpl implements UserService {
 
         LeaveYearlyBalance currentBalance = leaveYearlyBalanceRepository
             .findCurrentBalance(userId, LocalDate.now());
-        LeaveYearlyBalanceResponse leaveBalance = currentBalance == null
-            ? null
-            : LeaveYearlyBalanceResponse.from(currentBalance);
+        LocalDate today = LocalDate.now();
+        LeaveYearlyBalanceResponse leaveBalance = currentBalance == null ? null
+            : balanceResponse(currentBalance, userId, today);
 
         return new UserContextResponse(
             UserResponse.from(user),
@@ -73,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
         return new DashboardResponse(
             user.getNickname(),
-            balance.getRemainingLeaveMinutes(),
+            leaveLedgerService.getRemaining(userId, LocalDate.now()),
             balance.getAvgDailyWorkHours()
         );
     }
@@ -96,7 +107,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long userId) {
         User user = findActiveUser(userId);
+        notificationRepository.deleteByUser_Id(userId);
+        allocationRepository.deleteByEvent_User_Id(userId);
         calendarEventRepository.deleteByUser_Id(userId);
+        leaveGrantRepository.deleteByUser_Id(userId);
         leaveYearlyBalanceRepository.deleteByUser_Id(userId);
         userLeavePolicyRepository.deleteByUser_Id(userId);
         authRepository.delete(user);
@@ -126,7 +140,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserLeavePolicy(Long userId) {
         findActiveUser(userId);
+        notificationRepository.deleteByUser_Id(userId);
+        allocationRepository.deleteByEvent_User_Id(userId);
         calendarEventRepository.deleteByUser_Id(userId);
+        leaveGrantRepository.deleteByUser_Id(userId);
         leaveYearlyBalanceRepository.deleteByUser_Id(userId);
         userLeavePolicyRepository.deleteByUser_Id(userId);
     }
@@ -135,9 +152,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public LeaveYearlyBalanceResponse getLatestLeaveYearlyBalance(Long userId) {
         findActiveUser(userId);
-        return LeaveYearlyBalanceResponse.from(
-            findCurrentBalance(userId, LocalDate.now())
-        );
+        LocalDate today = LocalDate.now();
+        return balanceResponse(findCurrentBalance(userId, today), userId, today);
     }
 
     @Transactional
@@ -151,9 +167,9 @@ public class UserServiceImpl implements UserService {
             .findCurrentBalanceForUpdate(userId, LocalDate.now())
             .orElseThrow(() -> new ClientException(ErrorCode.CURRENT_LEAVE_BALANCE_NOT_FOUND));
 
-        balance.updateRemainingLeaveMinutes(remainingLeaveMinutes);
+        leaveLedgerService.adjustRemaining(balance, remainingLeaveMinutes);
 
-        return LeaveYearlyBalanceResponse.from(balance);
+        return balanceResponse(balance, userId, LocalDate.now());
     }
 
     @Transactional(readOnly = true)
@@ -162,6 +178,8 @@ public class UserServiceImpl implements UserService {
         findActiveUser(userId);
         UserLeavePolicy policy = findPolicy(userId);
         LeaveYearlyBalance balance = findCurrentBalance(userId, LocalDate.now());
+        int remaining = leaveLedgerService.getRemaining(userId, LocalDate.now());
+        int total = leaveLedgerService.getTotal(userId, LocalDate.now());
 
         LocalDateTime periodStart = balance.getStartDate().atStartOfDay();
         LocalDateTime periodEnd = balance.getEndDate().atTime(LocalTime.MAX);
@@ -173,15 +191,15 @@ public class UserServiceImpl implements UserService {
             );
 
         return new LeaveDashboardResponse(
-            balance.getRemainingLeaveMinutes(),
+            remaining,
             balance.getAvgDailyWorkHours(),
-            balance.getTotalLeaveMinutes(),
+            total,
             policy.getLeaveAccrualBasis().getCode(),
             policy.getLeaveAccrualBasis() == LeaveAccrualBasis.FISCAL_YEAR
                 ? policy.getFiscalYearBaseMonth()
                 : null,
             balance.getEndDate().plusDays(1),
-            balance.getRemainingLeaveMinutes(),
+            remaining,
             balance.getStartDate(),
             balance.getEndDate(),
             leaveEvents.stream()
@@ -251,7 +269,7 @@ public class UserServiceImpl implements UserService {
             .findCurrentBalance(user.getId(), LocalDate.now());
 
         if (currentBalance == null) {
-            leaveYearlyBalanceRepository.save(LeaveYearlyBalance.create(
+            LeaveYearlyBalance savedBalance = leaveYearlyBalanceRepository.save(LeaveYearlyBalance.create(
                 user,
                 period.startDate(),
                 period.endDate(),
@@ -259,6 +277,11 @@ public class UserServiceImpl implements UserService {
                 avgDailyWorkHours,
                 totalLeaveMinutes,
                 usedLeaveMinutes
+            ));
+            leaveGrantRepository.save(LeaveGrant.create(
+                user, savedBalance, LeaveGrantType.INITIAL, LeaveGrantSource.ONBOARDING,
+                "ONBOARDING:" + savedBalance.getStartDate(), totalLeaveMinutes, usedLeaveMinutes,
+                LocalDate.now(), savedBalance.getStartDate(), savedBalance.getEndDate()
             ));
             return;
         }
@@ -271,6 +294,16 @@ public class UserServiceImpl implements UserService {
             totalLeaveMinutes,
             usedLeaveMinutes
         );
+        if (leaveGrantRepository.findByBalanceIdForUpdate(currentBalance.getId()).isEmpty()) {
+            leaveGrantRepository.save(LeaveGrant.create(
+                user, currentBalance, LeaveGrantType.INITIAL, LeaveGrantSource.ONBOARDING,
+                "ONBOARDING:" + currentBalance.getStartDate(), totalLeaveMinutes, usedLeaveMinutes,
+                LocalDate.now(), currentBalance.getStartDate(), currentBalance.getEndDate()
+            ));
+        } else {
+            leaveLedgerService.adjustRemaining(
+                currentBalance, Math.max(0, totalLeaveMinutes - usedLeaveMinutes));
+        }
     }
 
     private void validateLeavePolicyRequest(UserLeavePolicyRequest request, LeaveAccrualBasis basis) {
@@ -312,6 +345,16 @@ public class UserServiceImpl implements UserService {
 
     private int defaultZero(Integer value) {
         return value == null ? 0 : value;
+    }
+
+    private LeaveYearlyBalanceResponse balanceResponse(
+        LeaveYearlyBalance balance, Long userId, LocalDate date) {
+        return LeaveYearlyBalanceResponse.from(
+            balance,
+            leaveLedgerService.getTotal(userId, date),
+            leaveLedgerService.getUsed(userId, date),
+            leaveLedgerService.getRemaining(userId, date)
+        );
     }
 
 }

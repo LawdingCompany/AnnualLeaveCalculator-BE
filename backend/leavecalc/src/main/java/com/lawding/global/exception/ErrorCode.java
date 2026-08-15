@@ -36,6 +36,7 @@ public enum ErrorCode {
 
     CALENDAR_EVENT_NOT_FOUND(2201, HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다."),
     CALENDAR_EVENT_PERIOD_INVALID(2202, HttpStatus.BAD_REQUEST, "일정 기간이 유효하지 않습니다."),
+    NOTIFICATION_NOT_FOUND(2301, HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."),
 
     DICTIONARY_NOT_FOUND(3001, HttpStatus.NOT_FOUND, "사전 항목을 찾을 수 없습니다."),
     DICTIONARY_CATEGORY_NOT_FOUND(3002, HttpStatus.NOT_FOUND, "사전 카테고리를 찾을 수 없습니다."),

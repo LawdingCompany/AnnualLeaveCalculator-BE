@@ -18,6 +18,11 @@ public record LeaveYearlyBalanceResponse(
 ) {
 
     public static LeaveYearlyBalanceResponse from(LeaveYearlyBalance balance) {
+        return from(balance, balance.getTotalLeaveMinutes(), balance.getUsedLeaveMinutes(),
+            balance.getRemainingLeaveMinutes());
+    }
+
+    public static LeaveYearlyBalanceResponse from(LeaveYearlyBalance balance, int total, int used, int remaining) {
         return new LeaveYearlyBalanceResponse(
             balance.getId(),
             balance.getUser().getId(),
@@ -25,9 +30,9 @@ public record LeaveYearlyBalanceResponse(
             balance.getEndDate(),
             balance.getWeeklyWorkingDays(),
             balance.getAvgDailyWorkHours(),
-            balance.getTotalLeaveMinutes(),
-            balance.getUsedLeaveMinutes(),
-            balance.getRemainingLeaveMinutes(),
+            total,
+            used,
+            remaining,
             balance.getIsFinalized()
         );
     }

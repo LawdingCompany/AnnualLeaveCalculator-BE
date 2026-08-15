@@ -30,6 +30,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.apache.commons:commons-csv:1.14.1'
+    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
 
     // JWT 생성/검증
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'

@@ -119,6 +119,13 @@ public class LeaveYearlyBalance {
         this.isFinalized = true;
     }
 
+    public void addGrantedMinutes(int minutes) {
+        if (Boolean.TRUE.equals(isFinalized) || minutes < 0) {
+            throw new ClientException(ErrorCode.LEAVE_MINUTES_INVALID);
+        }
+        this.totalLeaveMinutes = Math.addExact(this.totalLeaveMinutes, minutes);
+    }
+
     public void updateBalance(LocalDate startDate, LocalDate endDate,
         Integer weeklyWorkingDays, BigDecimal avgDailyWorkHours,
         Integer totalLeaveMinutes, Integer usedLeaveMinutes) {

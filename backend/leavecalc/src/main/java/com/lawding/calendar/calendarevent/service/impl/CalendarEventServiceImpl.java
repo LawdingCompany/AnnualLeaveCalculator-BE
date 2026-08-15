@@ -8,6 +8,7 @@ import com.lawding.calendar.calendarevent.repository.CalendarEventRepository;
 import com.lawding.calendar.calendarevent.service.CalendarEventService;
 import com.lawding.calendar.user.entity.LeaveYearlyBalance;
 import com.lawding.calendar.user.repository.LeaveYearlyBalanceRepository;
+import com.lawding.calendar.user.service.LeaveLedgerService;
 import com.lawding.global.exception.ClientException;
 import com.lawding.global.exception.ErrorCode;
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
     private final AuthRepository authRepository;
     private final LeaveYearlyBalanceRepository leaveYearlyBalanceRepository;
     private final CalendarEventRepository calendarEventRepository;
+    private final LeaveLedgerService leaveLedgerService;
 
     @Override
     public CalendarEvent createEvent(Long userId, CalendarEventRequest request) {
@@ -35,10 +37,6 @@ public class CalendarEventServiceImpl implements CalendarEventService {
         User user = findUser(userId);
         LeaveYearlyBalance balance = findCurrentBalance(userId, request.startDatetime().toLocalDate());
         int usedLeaveMinutes = effectiveUsedLeaveMinutes(request);
-
-        if (Boolean.TRUE.equals(request.isLeaveEvent())) {
-            balance.useLeave(usedLeaveMinutes);
-        }
 
         CalendarEvent event = CalendarEvent.create(
             user,
@@ -52,7 +50,11 @@ public class CalendarEventServiceImpl implements CalendarEventService {
             request.isLeaveEvent()
         );
 
-        return calendarEventRepository.save(event);
+        CalendarEvent savedEvent = calendarEventRepository.save(event);
+        if (Boolean.TRUE.equals(request.isLeaveEvent())) {
+            leaveLedgerService.allocate(savedEvent, balance, request.startDatetime().toLocalDate(), usedLeaveMinutes);
+        }
+        return savedEvent;
     }
 
     @Transactional(readOnly = true)
@@ -85,19 +87,18 @@ public class CalendarEventServiceImpl implements CalendarEventService {
         LeaveYearlyBalance oldBalance = findBalanceForUpdate(
             event.getLeaveYearlyBalance().getId()
         );
-        int oldUsedMinutes = normalizeUsedLeaveMinutes(event.getUsedLeaveMinutes());
         int newUsedMinutes = effectiveUsedLeaveMinutes(request);
         boolean wasLeaveEvent = Boolean.TRUE.equals(event.getIsLeaveEvent());
         boolean willBeLeaveEvent = Boolean.TRUE.equals(request.isLeaveEvent());
 
         if (wasLeaveEvent) {
-            oldBalance.cancelUsedLeave(oldUsedMinutes);
+            leaveLedgerService.cancel(event, oldBalance);
         }
 
         LeaveYearlyBalance newBalance = findCurrentBalance(userId, request.startDatetime().toLocalDate());
 
         if (willBeLeaveEvent) {
-            newBalance.useLeave(newUsedMinutes);
+            leaveLedgerService.allocate(event, newBalance, request.startDatetime().toLocalDate(), newUsedMinutes);
         }
 
         event.update(
@@ -117,8 +118,7 @@ public class CalendarEventServiceImpl implements CalendarEventService {
         CalendarEvent event = findOwnedEvent(userId, eventId);
 
         if (Boolean.TRUE.equals(event.getIsLeaveEvent())) {
-            findBalanceForUpdate(event.getLeaveYearlyBalance().getId())
-                .cancelUsedLeave(normalizeUsedLeaveMinutes(event.getUsedLeaveMinutes()));
+            leaveLedgerService.cancel(event, findBalanceForUpdate(event.getLeaveYearlyBalance().getId()));
         }
 
         calendarEventRepository.delete(event);
