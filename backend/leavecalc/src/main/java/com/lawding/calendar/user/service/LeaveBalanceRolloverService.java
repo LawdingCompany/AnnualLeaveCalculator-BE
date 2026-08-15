@@ -64,7 +64,7 @@ public class LeaveBalanceRolloverService {
         BigDecimal totalLeaveDays = annualLeaveCalculationClient.calculateTotalLeaveDays(
             policy.getLeaveAccrualBasis(),
             policy.getHireDate(),
-            today
+            nextStartDate
         );
 
         int totalLeaveMinutes = leavePolicyCalculator.convertLeaveDaysToMinutes(

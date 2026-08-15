@@ -21,7 +21,7 @@ public class LeavePolicyCalculator {
     ) {
         LocalDate startDate = switch (basis) {
             case HIRE_DATE -> calculateHireStart(hireDate, referenceDate);
-            case FISCAL_YEAR -> calculateFiscalStart(hireDate, fiscalYearBaseMonth, referenceDate);
+            case FISCAL_YEAR -> calculateFiscalStart(fiscalYearBaseMonth, referenceDate);
         };
         return new DatePeriod(startDate, startDate.plusYears(1).minusDays(1));
     }
@@ -32,12 +32,11 @@ public class LeavePolicyCalculator {
     }
 
     private LocalDate calculateFiscalStart(
-        LocalDate hireDate,
         Integer baseMonth,
         LocalDate referenceDate
     ) {
         LocalDate fiscalStart = LocalDate.of(referenceDate.getYear(), baseMonth, 1);
-        if (hireDate.isBefore(fiscalStart)) {
+        if (referenceDate.isBefore(fiscalStart)) {
             fiscalStart = fiscalStart.minusYears(1);
         }
         return fiscalStart;
