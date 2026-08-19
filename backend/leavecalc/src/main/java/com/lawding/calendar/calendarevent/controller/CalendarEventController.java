@@ -37,7 +37,6 @@ public class CalendarEventController {
     public ResponseEntity<ApiResponse<CalendarEventCreateResponse>> createEvent(
         @AuthenticationPrincipal Long userId,
         @RequestBody @Valid CalendarEventRequest request) {
-        log.info("[req] POST /calendar-events - 일정 등록 요청, userId={}", userId);
         return ResponseEntity.ok(
             ApiResponse.ok(CalendarEventCreateResponse.from(
                 calendarEventService.createEvent(userId, request)
@@ -51,8 +50,6 @@ public class CalendarEventController {
         @RequestParam @Min(value = 1900, message = "year는 1900 이상이어야 합니다.") int year,
         @RequestParam @Min(value = 1, message = "month는 1 이상이어야 합니다.")
         @Max(value = 12, message = "month는 12 이하여야 합니다.") int month) {
-        log.info("[req] GET /calendar-events?year={}&month={} - 월별 일정 목록 조회 요청, userId={}",
-            year, month, userId);
         return ResponseEntity.ok(
             ApiResponse.ok(
                 calendarEventService.findEventsByMonth(userId, year, month).stream()
@@ -66,7 +63,6 @@ public class CalendarEventController {
     public ResponseEntity<ApiResponse<CalendarEventResponse>> getEvent(
         @AuthenticationPrincipal Long userId,
         @PathVariable Long id) {
-        log.info("[req] GET /calendar-events/{} - 일정 단건 조회 요청, userId={}", id, userId);
         return ResponseEntity.ok(
             ApiResponse.ok(CalendarEventResponse.from(calendarEventService.findEvent(userId, id)))
         );
@@ -77,7 +73,6 @@ public class CalendarEventController {
         @AuthenticationPrincipal Long userId,
         @PathVariable Long id,
         @RequestBody @Valid CalendarEventRequest request) {
-        log.info("[req] PUT /calendar-events/{} - 일정 수정 요청, userId={}", id, userId);
         calendarEventService.updateEvent(userId, id, request);
         return ResponseEntity.ok(ApiResponse.okMessage("일정이 수정되었습니다."));
     }
@@ -86,7 +81,6 @@ public class CalendarEventController {
     public ResponseEntity<ApiResponse<Void>> deleteEvent(
         @AuthenticationPrincipal Long userId,
         @PathVariable Long id) {
-        log.info("[req] DELETE /calendar-events/{} - 일정 삭제 요청, userId={}", id, userId);
         calendarEventService.deleteEvent(userId, id);
         return ResponseEntity.ok(ApiResponse.okMessage("일정이 삭제되었습니다."));
     }

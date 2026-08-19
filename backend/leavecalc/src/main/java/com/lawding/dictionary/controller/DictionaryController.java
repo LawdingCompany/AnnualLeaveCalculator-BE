@@ -28,7 +28,6 @@ public class DictionaryController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<DictionaryResponse>>> getActiveDictionaries() {
-        log.info("[req] GET /dictionaries - 연차 백과사전 전체 리스트 요청");
         return ResponseEntity.ok(
             ApiResponse.ok(
                 dictionaryService.findActiveDictionaries().stream()
@@ -41,7 +40,6 @@ public class DictionaryController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<DictionaryResponse>> getActiveDictionary(
         @PathVariable Long id) {
-        log.info("[req] GET /dictionaries/[id] - 연차 백과사전 항목({}) 요청", id);
         return ResponseEntity.ok(
             ApiResponse.ok(
                 DictionaryResponse.from(
@@ -57,8 +55,6 @@ public class DictionaryController {
         @RequestParam(defaultValue = "0") @Min(0) int page,
         @RequestParam(defaultValue = "6") @Min(1) int size
     ) {
-        log.info("[req] GET /dictionaries/search?keyword=[]&page=[]&size=[] - 연차 백과사전 검색 키워드 = {}, 페이지 = {}, 크기 = {}",
-            keyword, page, size);
 
         Page<Dictionary> result = dictionaryService.searchDictionaries(keyword, page, size);
 

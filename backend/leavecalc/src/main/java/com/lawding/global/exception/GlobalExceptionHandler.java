@@ -32,11 +32,11 @@ public class GlobalExceptionHandler {
 
         ErrorCode ec = ex.getErrorCode();
         if (ex instanceof ClientException) {
-            log.warn("ClientException at uri={}, errorCode={}, msg={}, traceId={}",
-                path(req), ec.name(), ex.getMessage(), traceId());
+            log.warn("[REQUEST_FAILURE] uri={}, errorCode={}, exception={}, msg={}, traceId={}",
+                path(req), ec.name(), ex.getClass().getSimpleName(), ex.getMessage(), traceId());
         } else {
-            log.error("ServerException at uri={}, errorCode={}, msg={}, traceId={}",
-                path(req), ec.name(), ex.getMessage(), traceId(), ex);
+            log.error("[SYSTEM_ERROR] uri={}, errorCode={}, exception={}, msg={}, traceId={}",
+                path(req), ec.name(), ex.getClass().getSimpleName(), ex.getMessage(), traceId(), ex);
         }
 
         return ResponseEntity.status(ec.getHttpStatus())
@@ -47,8 +47,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleEntityNotFound(
         EntityNotFoundException ex, HttpServletRequest req) {
 
-        log.warn("EntityNotFound at uri={}, msg={}, traceId={}",
-            path(req), ex.getMessage(), traceId());
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, msg={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getMessage(), traceId());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(
             ErrorCode.RESOURCE_NOT_FOUND.getCode(),
@@ -61,8 +61,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleIllegalArgument(
         IllegalArgumentException ex, HttpServletRequest req) {
 
-        log.warn("IllegalArgument at uri={}, msg={}, traceId={}",
-            path(req), ex.getMessage(), traceId());
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, msg={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getMessage(), traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
@@ -75,8 +75,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleIllegalState(
         IllegalStateException ex, HttpServletRequest req) {
 
-        log.warn("IllegalState at uri={}, msg={}, traceId={}",
-            path(req), ex.getMessage(), traceId());
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, msg={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getMessage(), traceId());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
@@ -98,8 +98,8 @@ public class GlobalExceptionHandler {
             })
             .collect(Collectors.joining(", "));
 
-        log.error("Validation failed at uri={}, errors={}, traceId={}",
-            path(req), msg, traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, errors={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), msg, traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.VALIDATION_FAILED.getCode(),
@@ -117,8 +117,8 @@ public class GlobalExceptionHandler {
             .map(v -> v.getPropertyPath() + ": " + v.getMessage())
             .collect(Collectors.joining(", "));
 
-        log.error("ConstraintViolation at uri={}, violations={}, traceId={}",
-            path(req), msg, traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, violations={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), msg, traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.VALIDATION_FAILED.getCode(),
@@ -132,7 +132,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleNotReadable(
         HttpMessageNotReadableException ex, HttpServletRequest req) {
 
-        log.error("JsonParseError at uri={}, traceId={}", path(req), traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, msg={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getMessage(), traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.JSON_PARSE_ERROR.getCode(),
@@ -146,7 +147,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleMissingHeader(
         MissingRequestHeaderException ex, HttpServletRequest req) {
         if ("X-Platform".equalsIgnoreCase(ex.getHeaderName())) {
-            log.error("Missing X-Platform header at uri={}, traceId={}", path(req), traceId(), ex);
+            log.warn("[REQUEST_FAILURE] uri={}, exception={}, header={}, traceId={}",
+                path(req), ex.getClass().getSimpleName(), ex.getHeaderName(), traceId());
 
             return ResponseEntity.badRequest().body(ApiResponse.error(
                 ErrorCode.MISSING_X_PLATFORM_HEADER.getCode(),
@@ -155,7 +157,8 @@ public class GlobalExceptionHandler {
             ));
         }
 
-        log.error("Missing header {} at uri={}, traceId={}", ex.getHeaderName(), path(req), traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, header={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getHeaderName(), traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
@@ -177,8 +180,8 @@ public class GlobalExceptionHandler {
             String msg = ErrorCode.INVALID_PLATFORM_HEADER.getMessage()
                          + " (전달값: " + bad + ", 허용값: " + allowed + ")";
 
-            log.error("Invalid X-Platform header at uri={}, badValue={}, traceId={}",
-                path(req), bad, traceId(), ex);
+            log.warn("[REQUEST_FAILURE] uri={}, exception={}, badValue={}, traceId={}",
+                path(req), ex.getClass().getSimpleName(), bad, traceId());
 
             return ResponseEntity.badRequest().body(ApiResponse.error(
                 ErrorCode.INVALID_PLATFORM_HEADER.getCode(),
@@ -186,7 +189,8 @@ public class GlobalExceptionHandler {
             ));
         }
 
-        log.error("TypeMismatch at uri={}, param={}, traceId={}", path(req), ex.getName(), traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, param={}, msg={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getName(), ex.getMessage(), traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
@@ -200,8 +204,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleMethodNotAllowed(
         HttpRequestMethodNotSupportedException ex, HttpServletRequest req) {
 
-        log.error("MethodNotAllowed at uri={}, method={}, traceId={}",
-            path(req), ex.getMethod(), traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, method={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getMethod(), traceId());
 
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(ApiResponse.error(
             ErrorCode.METHOD_NOT_ALLOWED.getCode(),
@@ -215,7 +219,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(
         DataIntegrityViolationException ex, HttpServletRequest req) {
 
-        log.error("DataIntegrityViolation at uri={}, traceId={}", path(req), traceId(), ex);
+        log.warn("[REQUEST_FAILURE] uri={}, exception={}, msg={}, traceId={}",
+            path(req), ex.getClass().getSimpleName(), ex.getMostSpecificCause().getMessage(), traceId());
 
         return ResponseEntity.badRequest().body(ApiResponse.error(
             ErrorCode.INVALID_INPUT.getCode(),
@@ -232,8 +237,13 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.resolve(ex.getStatusCode().value());
         HttpStatus http = status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status;
 
-        log.error("ErrorResponseException at uri={}, httpStatus={}, traceId={}",
-            path(req), http, traceId(), ex);
+        if (http.is4xxClientError()) {
+            log.warn("[REQUEST_FAILURE] uri={}, httpStatus={}, exception={}, msg={}, traceId={}",
+                path(req), http, ex.getClass().getSimpleName(), ex.getMessage(), traceId());
+        } else {
+            log.error("[SYSTEM_ERROR] uri={}, httpStatus={}, exception={}, msg={}, traceId={}",
+                path(req), http, ex.getClass().getSimpleName(), ex.getMessage(), traceId(), ex);
+        }
 
         return ResponseEntity.status(http).body(ApiResponse.error(
             http.is4xxClientError() ? ErrorCode.INVALID_INPUT.getCode() : ErrorCode.INTERNAL_ERROR.getCode(),
@@ -245,7 +255,8 @@ public class GlobalExceptionHandler {
     // ---- 최후 보루 (정의되지 않은 예외 전부) → INTERNAL_ERROR ----
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleAny(Exception ex, HttpServletRequest req) {
-        log.error("Unhandled exception at uri={}, traceId={}", path(req), traceId(), ex);
+        log.error("[SYSTEM_ERROR] uri={}, exception={}, msg={}, traceId={}",
+            path(req), ex.getClass().getName(), ex.getMessage(), traceId(), ex);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error(
             ErrorCode.INTERNAL_ERROR.getCode(),

@@ -21,7 +21,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -80,6 +80,8 @@ server:
 logging:
   level:
     org.springframework.security: INFO
+    org.hibernate.SQL: OFF
+    org.hibernate.orm.jdbc.bind: OFF
     root: INFO
     com.lawding: INFO
 

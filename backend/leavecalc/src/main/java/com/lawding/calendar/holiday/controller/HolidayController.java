@@ -24,8 +24,6 @@ public class HolidayController {
     public ResponseEntity<ApiResponse<List<HolidayResponse>>> getHolidaysByYear(
         @RequestParam int year) {
 
-        log.info("[req] GET /holidays?year=[] - 공휴일 데이터 조회 요청");
-
         return ResponseEntity.ok(
             ApiResponse.ok(
                 holidayService.getHolidaysByYear(year).stream()
@@ -39,8 +37,6 @@ public class HolidayController {
     public ResponseEntity<ApiResponse<List<HolidayResponse>>> getHolidaysByYearRange(
         @RequestParam("start-year") int startYear,
         @RequestParam("end-year") int endYear) {
-
-        log.info("[req] GET /holidays?start-year=[]]&end-year=[]] - 공휴일 데이터 조회(기간) 요청");
 
         return ResponseEntity.ok(
             ApiResponse.ok(
