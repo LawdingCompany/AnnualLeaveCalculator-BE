@@ -258,11 +258,11 @@ public class UserServiceImpl implements UserService {
             LPCalculator.calculateAvgDailyWorkHours(request.workPattern(), request.breakTimePattern());
 
         int weeklyWorkingDays = LPCalculator.calculateWeeklyWorkingDays(request.workPattern());
-        int totalLeaveMinutes = LPCalculator.convertLeaveDaysToMinutes(
-            BigDecimal.valueOf(defaultZero(request.totalLeave())),
+        int totalLeaveMinutes = LPCalculator.convertLeaveDaysToMinutesCeiling(
+            defaultZero(request.totalLeave()),
             avgDailyWorkHours);
-        int usedLeaveMinutes = LPCalculator.convertLeaveDaysToMinutes(
-            BigDecimal.valueOf(defaultZero(request.usedLeave())),
+        int usedLeaveMinutes = LPCalculator.convertLeaveDaysToMinutesCeiling(
+            defaultZero(request.usedLeave()),
             avgDailyWorkHours);
 
         LeaveYearlyBalance currentBalance = leaveYearlyBalanceRepository
@@ -343,8 +343,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private int defaultZero(Integer value) {
-        return value == null ? 0 : value;
+    private BigDecimal defaultZero(BigDecimal value) {
+        return value == null ? BigDecimal.ZERO : value;
     }
 
     private LeaveYearlyBalanceResponse balanceResponse(

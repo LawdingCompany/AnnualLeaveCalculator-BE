@@ -78,4 +78,19 @@ public class LeavePolicyCalculator {
             .multiply(BigDecimal.valueOf(60))
             .intValue();
     }
+
+    public int convertLeaveDaysToMinutesCeiling(
+        BigDecimal leaveDays,
+        BigDecimal avgDailyWorkHours
+    ) {
+        if (leaveDays == null || avgDailyWorkHours == null) {
+            return 0;
+        }
+
+        return leaveDays
+            .multiply(avgDailyWorkHours)
+            .multiply(BigDecimal.valueOf(60))
+            .setScale(0, RoundingMode.CEILING)
+            .intValueExact();
+    }
 }

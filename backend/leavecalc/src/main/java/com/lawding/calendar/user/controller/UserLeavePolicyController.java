@@ -4,6 +4,7 @@ import com.lawding.calendar.user.dto.request.UserLeavePolicyRequest;
 import com.lawding.calendar.user.dto.response.UserLeavePolicyResponse;
 import com.lawding.calendar.user.service.UserService;
 import com.lawding.global.common.dto.response.ApiResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,7 +33,7 @@ public class UserLeavePolicyController {
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> saveUserLeavePolicy(
         @AuthenticationPrincipal Long userId,
-        @RequestBody UserLeavePolicyRequest request
+        @Valid @RequestBody UserLeavePolicyRequest request
     ) {
         userService.saveUserLeavePolicy(userId, request);
         return ResponseEntity.ok(ApiResponse.okMessage("사용자 연차 정책이 저장되었습니다."));
@@ -41,7 +42,7 @@ public class UserLeavePolicyController {
     @PutMapping
     public ResponseEntity<ApiResponse<UserLeavePolicyResponse>> updateUserLeavePolicy(
         @AuthenticationPrincipal Long userId,
-        @RequestBody UserLeavePolicyRequest request
+        @Valid @RequestBody UserLeavePolicyRequest request
     ) {
         return ResponseEntity.ok(ApiResponse.ok(userService.updateUserLeavePolicy(userId, request)));
     }

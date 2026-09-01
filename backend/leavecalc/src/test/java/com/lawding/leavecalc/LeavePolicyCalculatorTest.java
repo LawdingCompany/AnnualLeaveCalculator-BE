@@ -4,12 +4,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.lawding.calendar.user.enums.LeaveAccrualBasis;
 import com.lawding.global.common.dto.DatePeriod;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class LeavePolicyCalculatorTest {
 
     private final LeavePolicyCalculator calculator = new LeavePolicyCalculator();
+
+    @Test
+    void convertsDecimalLeaveDaysToMinutesWithoutDroppingFractionalDays() {
+        BigDecimal eightHours = new BigDecimal("8.0");
+
+        assertThat(calculator.convertLeaveDaysToMinutesCeiling(new BigDecimal("7.5"), eightHours))
+            .isEqualTo(3_600);
+        assertThat(calculator.convertLeaveDaysToMinutesCeiling(new BigDecimal("2.125"), eightHours))
+            .isEqualTo(1_020);
+        assertThat(calculator.convertLeaveDaysToMinutesCeiling(new BigDecimal("16.355"), eightHours))
+            .isEqualTo(7_851);
+    }
 
     @Test
     void calculatesFiscalPeriodContainingReferenceDateWhenBaseMonthHasPassed() {
