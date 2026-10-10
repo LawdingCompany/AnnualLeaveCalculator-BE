@@ -258,3 +258,158 @@ erDiagram
 | --- | --- |
 | `holidays` | 연도별 공휴일 정보 |
 | `app_version_policy` | 플랫폼별 현재·최소 앱 버전과 업데이트 정보 |
+
+## 컬럼별 NULL 여부와 기본값
+
+표기: **NN** = `NOT NULL`, **NULL** = NULL 허용, `PK` = 기본키, `FK` = 외래키. `BIGSERIAL` 기본키는 자동 증가합니다. 아래 정의는 Flyway 마이그레이션 기준이며 운영 DB와 직접 대조한 결과는 아닙니다.
+
+### `users`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `username` | VARCHAR(255) | NN |
+| `email` | VARCHAR(255) | NN, UNIQUE |
+| `provider` | VARCHAR(255) | NN |
+| `nickname` | VARCHAR(255) | NULL |
+| `last_login_at` | TIMESTAMP | NULL |
+| `refresh_token` | VARCHAR(512) | NULL |
+| `onboarding_completed` | BOOLEAN | NN, DEFAULT FALSE |
+| `created_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| `updated_at` | TIMESTAMP | NULL |
+
+### `user_leave_policies`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `user_id` | BIGINT | NN, PK, `users.id` FK; 사용자당 최대 1행 |
+| `accepted_at` | TIMESTAMP | NN |
+| `leave_accrual_basis` | VARCHAR(30) | NN |
+| `hire_date` | DATE | NN |
+| `fiscal_year_base_month` | INTEGER | NULL |
+| `company_size` | INTEGER | NULL |
+| `work_pattern` | JSON | NULL |
+| `break_time_pattern` | JSON | NULL |
+| `created_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| `updated_at` | TIMESTAMP | NULL |
+
+### `user_notifications`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `user_id` | BIGINT | NN, `users.id` FK ON DELETE CASCADE |
+| `type` | VARCHAR(50) | NN |
+| `title` | VARCHAR(100) | NN |
+| `message` | VARCHAR(500) | NN |
+| `granted_minutes` | INTEGER | NULL |
+| `event_key` | VARCHAR(150) | NN |
+| `is_read` | BOOLEAN | NN, DEFAULT FALSE |
+| `read_at` | TIMESTAMP | NULL |
+| `created_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| 제약 | — | UNIQUE (`user_id`, `event_key`) |
+
+### `leave_yearly_balances`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `user_id` | BIGINT | **NULL**, `users.id` FK |
+| `start_date`, `end_date` | DATE | NN |
+| `weekly_working_days` | INTEGER | NN |
+| `avg_daily_work_hours` | DECIMAL(4,2) | NN |
+| `total_leave_minutes` | INTEGER | NN |
+| `used_leave_minutes` | INTEGER | NN, DEFAULT 0 |
+| `is_finalized` | BOOLEAN | NN, DEFAULT FALSE |
+| `created_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| `updated_at` | TIMESTAMP | NULL |
+| 제약 | — | UNIQUE (`user_id`, `start_date`, `end_date`); `user_id`가 NULL이면 PostgreSQL 특성상 같은 기간의 여러 행이 허용될 수 있음 |
+
+### `leave_grants`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `user_id` | BIGINT | NN, `users.id` FK ON DELETE CASCADE |
+| `leave_yearly_balance_id` | BIGINT | NN, 잔액 FK ON DELETE CASCADE |
+| `grant_type`, `source` | VARCHAR(30) | NN |
+| `source_key` | VARCHAR(120) | NN |
+| `granted_minutes` | INTEGER | NN, CHECK >= 0 |
+| `adjusted_minutes` | INTEGER | NN, DEFAULT 0 |
+| `used_minutes` | INTEGER | NN, DEFAULT 0, CHECK >= 0 |
+| `granted_date`, `start_date`, `end_date` | DATE | NN |
+| `created_at`, `updated_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| 제약 | — | UNIQUE (`user_id`, `source_key`); CHECK `start_date <= end_date`; CHECK `granted_minutes + adjusted_minutes - used_minutes >= 0` |
+
+### `calendar_events`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `user_id` | BIGINT | **NULL**, `users.id` FK |
+| `leave_yearly_balance_id` | BIGINT | **NULL**, 잔액 FK |
+| `title` | VARCHAR(255) | NN |
+| `description` | TEXT | NULL |
+| `start_datetime`, `end_datetime` | TIMESTAMP | NN |
+| `used_leave_minutes` | INTEGER | NN |
+| `is_all_day`, `is_leave_event` | BOOLEAN | **NULL**, DEFAULT FALSE (NOT NULL 제약 없음) |
+| `created_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| `updated_at` | TIMESTAMP | NULL |
+
+### `calendar_event_leave_allocations`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `calendar_event_id` | BIGINT | NN, 일정 FK ON DELETE CASCADE |
+| `leave_grant_id` | BIGINT | NN, 발생 원장 FK ON DELETE CASCADE |
+| `allocated_minutes` | INTEGER | NN, CHECK > 0 |
+
+### `dictionary_category`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `name` | VARCHAR(20) | NN, UNIQUE |
+
+### `dictionary`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `category_id` | BIGINT | NN, `dictionary_category.id` FK |
+| `question` | VARCHAR(200) | NN |
+| `content` | TEXT | NN |
+| `deleted` | BOOLEAN | NN, DEFAULT FALSE |
+| `deleted_at` | TIMESTAMP | NULL |
+| `created_at`, `updated_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+
+### `feedback`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `type` | VARCHAR(20) | NN |
+| `content` | VARCHAR(1000) | NULL |
+| `email` | VARCHAR(255) | NULL |
+| `rating` | INTEGER | NULL |
+| `calculation_id` | VARCHAR(36) | NULL |
+| `platform` | VARCHAR(20) | NN |
+| `status` | VARCHAR(20) | NN, DEFAULT 'RECEIVED' |
+| `created_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+
+### `recommended_schedules`
+
+| 컬럼 | 타입 | NULL / 기본값 / 조건 |
+| --- | --- | --- |
+| `id` | BIGSERIAL | NN, PK |
+| `name` | VARCHAR(100) | NN |
+| `start_date`, `end_date` | DATE | NN |
+| `created_at`, `updated_at` | TIMESTAMP | NN, DEFAULT CURRENT_TIMESTAMP |
+| 제약 | — | CHECK `start_date <= end_date`; UNIQUE (`name`, `start_date`, `end_date`) |
+
+## 외래키 삭제 동작과 인덱스
+
+- ON DELETE CASCADE: `user_notifications.user_id`, `leave_grants.user_id`, `leave_grants.leave_yearly_balance_id`, `calendar_event_leave_allocations.calendar_event_id`, `calendar_event_leave_allocations.leave_grant_id`.
+- 그 외 FK는 마이그레이션에서 삭제 동작을 별도로 지정하지 않았습니다.
+- 조회 인덱스: 잔액의 `(is_finalized, end_date)`, `(user_id, id DESC)`; 일정의 `(user_id, is_leave_event, start_datetime, end_datetime)`; 원장의 `(user_id, start_date, end_date)`, `(leave_yearly_balance_id)`; 배분의 `(calendar_event_id)`, `(leave_grant_id)`; 알림의 `(user_id, created_at DESC)` 및 `is_read = FALSE` 부분 인덱스; 추천 일정의 `(end_date, start_date)`.
