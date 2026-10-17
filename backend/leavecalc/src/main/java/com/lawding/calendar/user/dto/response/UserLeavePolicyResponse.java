@@ -2,6 +2,7 @@ package com.lawding.calendar.user.dto.response;
 
 import com.lawding.calendar.user.dto.WorkPattern;
 import com.lawding.calendar.user.entity.UserLeavePolicy;
+import com.lawding.calendar.user.enums.LeaveUsageType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -13,7 +14,8 @@ public record UserLeavePolicyResponse(
     Integer fiscalYearBaseMonth,
     Integer companySize,
     WorkPattern workPattern,
-    WorkPattern breakTimePattern
+    WorkPattern breakTimePattern,
+    LeaveUsageType leaveUsageType
 ) {
 
     public static UserLeavePolicyResponse from(UserLeavePolicy policy) {
@@ -25,7 +27,8 @@ public record UserLeavePolicyResponse(
             policy.getFiscalYearBaseMonth(),
             policy.getCompanySize(),
             policy.getWorkPattern(),
-            policy.getBreakTimePattern()
+            policy.getBreakTimePattern(),
+            policy.getLeaveUsageType()
         );
     }
 }

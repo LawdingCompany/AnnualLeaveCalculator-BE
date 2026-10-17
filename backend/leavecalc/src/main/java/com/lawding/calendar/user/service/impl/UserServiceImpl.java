@@ -225,7 +225,8 @@ public class UserServiceImpl implements UserService {
                     request.fiscalYearBaseMonth(),
                     request.companySize(),
                     request.workPattern(),
-                    request.breakTimePattern()
+                    request.breakTimePattern(),
+                    request.leaveUsageType()
                 );
                 return existing;
             })
@@ -237,7 +238,8 @@ public class UserServiceImpl implements UserService {
                 request.fiscalYearBaseMonth(),
                 request.companySize(),
                 request.workPattern(),
-                request.breakTimePattern()
+                request.breakTimePattern(),
+                request.leaveUsageType()
             ));
 
         UserLeavePolicy savedPolicy = userLeavePolicyRepository.save(policy);

@@ -3,6 +3,7 @@ package com.lawding.calendar.user.entity;
 import com.lawding.auth.entity.User;
 import com.lawding.calendar.user.dto.WorkPattern;
 import com.lawding.calendar.user.enums.LeaveAccrualBasis;
+import com.lawding.calendar.user.enums.LeaveUsageType;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,6 +47,10 @@ public class UserLeavePolicy {
     @Enumerated(EnumType.STRING)
     private LeaveAccrualBasis leaveAccrualBasis;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "leave_usage_type", length = 20)
+    private LeaveUsageType leaveUsageType;
+
     private LocalDate hireDate;
     private Integer fiscalYearBaseMonth;
     private Integer companySize;
@@ -74,7 +79,8 @@ public class UserLeavePolicy {
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        WorkPattern breakTimePattern
+        WorkPattern breakTimePattern,
+        LeaveUsageType leaveUsageType
     ) {
         this.user = user;
         this.acceptedAt = acceptedAt;
@@ -84,6 +90,7 @@ public class UserLeavePolicy {
         this.companySize = companySize;
         this.workPattern = workPattern;
         this.breakTimePattern = breakTimePattern;
+        this.leaveUsageType = leaveUsageType;
     }
 
     public static UserLeavePolicy create(
@@ -94,7 +101,8 @@ public class UserLeavePolicy {
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        WorkPattern breakTimePattern
+        WorkPattern breakTimePattern,
+        LeaveUsageType leaveUsageType
     ) {
         return UserLeavePolicy.builder()
             .user(user)
@@ -105,6 +113,7 @@ public class UserLeavePolicy {
             .companySize(companySize)
             .workPattern(workPattern)
             .breakTimePattern(breakTimePattern)
+            .leaveUsageType(leaveUsageType)
             .build();
     }
 
@@ -115,7 +124,8 @@ public class UserLeavePolicy {
         Integer fiscalYearBaseMonth,
         Integer companySize,
         WorkPattern workPattern,
-        WorkPattern breakTimePattern
+        WorkPattern breakTimePattern,
+        LeaveUsageType leaveUsageType
     ) {
         this.acceptedAt = acceptedAt;
         this.leaveAccrualBasis = basis;
@@ -124,10 +134,17 @@ public class UserLeavePolicy {
         this.companySize = companySize;
         this.workPattern = workPattern;
         this.breakTimePattern = breakTimePattern;
+        if (leaveUsageType != null) {
+            this.leaveUsageType = leaveUsageType;
+        }
     }
 
     public void updateWorkPattern(WorkPattern workPattern) {
         this.workPattern = workPattern;
+    }
+
+    public void updateLeaveUsageType(LeaveUsageType leaveUsageType) {
+        this.leaveUsageType = leaveUsageType;
     }
 
 }

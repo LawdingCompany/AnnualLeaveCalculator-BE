@@ -69,7 +69,8 @@ class UserServiceImplTest {
             null,
             5,
             new WorkPattern(Map.of()),
-            new WorkPattern(Map.of())
+            new WorkPattern(Map.of()),
+            null
         );
         LeaveYearlyBalance balance = LeaveYearlyBalance.create(
             user,
